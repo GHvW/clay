@@ -8,6 +8,7 @@ pub enum Endian {
 
 impl Endian {
 
+    // TODO - make private?
     pub fn convert_int32(&self, buffer: [u8; 4]) -> i32 {
         match self {
             Endian::Big => i32::from_be_bytes(buffer),
@@ -22,7 +23,7 @@ impl Endian {
         }
     }
 
-    // TODO - refactor these readers later to use one algo?
+    // TODO - refactor these readers later to use one algo? factor out to be able to map over it instead?
     pub fn read_int<'a>(&self, bytes: &'a[u8]) -> Result<(i32, &'a[u8]), TryFromSliceError> {
         bytes[0..4] // & here automagically derefed by .try_into?
             .try_into()
@@ -42,14 +43,6 @@ impl Endian {
     }
 }
 
-// pub fn convert_int(endian: Endian, bytes: &[u8]) -> Result<(i32, &[u8]), TryFromSliceError> {
-//     bytes[0..4] // & here automagically derefed by .try_into?
-//         .try_into()
-//         .map(|int_bytes| {
-//             let i = endian.read_int32(int_bytes);
-//             (i, &bytes[4..])
-//         })
-// }
 
 
 #[cfg(test)]
