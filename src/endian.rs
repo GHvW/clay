@@ -102,13 +102,53 @@ mod tests {
     }
 
 
+    // ************************* double tests **********************
     #[test]
-    fn convert_bit_endian_double_perfect_size() {
+    fn convert_big_endian_double_perfect_size() {
         // 12345.6789
         // [64, 200, 28, 214, 230, 49, 248, 161]
         let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001];
 
         let result = Endian::Big.read_double(&initial).unwrap().0;
+
+        let expected =  12345.6789;
+        assert_eq!(result, expected);
+    }
+
+
+    #[test]
+    fn convert_big_endian_double_extra_bytes() {
+        // 12345.6789
+        // [64, 200, 28, 214, 230, 49, 248, 161]
+        let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
+        0b01001100, 0b11011100, 0b01011100, 0b11000100, 0b10100110, 0b00110101, 0b11011000, 0b10101001];
+
+        let result = Endian::Big.read_double(&initial).unwrap().0;
+
+        let expected =  12345.6789;
+        assert_eq!(result, expected);
+    }
+
+
+    #[test]
+    fn convert_big_endian_double_extra_bytes_has_correct_remaining_bytes() {
+        // 12345.6789
+        // [64, 200, 28, 214, 230, 49, 248, 161]
+        let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
+        0b01001100, 0b11011100, 0b01011100, 0b11000100, 0b10100110, 0b00110101, 0b11011000, 0b10101001];
+
+        let (_, rest) = Endian::Big.read_double(&initial).unwrap();
+
+        let expected = [0b01001100, 0b11011100, 0b01011100, 0b11000100, 0b10100110, 0b00110101, 0b11011000, 0b10101001];
+        assert_eq!(rest, expected);
+    }
+
+
+    #[test]
+    fn convert_little_endian_double_perfect_size() {
+        let initial = [0b10100001, 0b11111000, 0b00110001, 0b11100110, 0b11010110, 0b00011100, 0b11001000, 0b01000000];
+
+        let result = Endian::Little.read_double(&initial).unwrap().0;
 
         let expected =  12345.6789;
         assert_eq!(result, expected);
