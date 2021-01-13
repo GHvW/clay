@@ -1,5 +1,5 @@
 
-pub enum MultiPatchParttype {
+pub enum MultiPatchPartType {
     TriangleStrip,
     TriangleFan,
     OuterRing,
@@ -9,13 +9,13 @@ pub enum MultiPatchParttype {
 }
 
 
-pub fn resolveMultiPatchPartType(n: i32) -> Option<MultiPatchParttype> {
+pub fn resolve_multi_patch_part_type(n: i32) -> Option<MultiPatchPartType> {
     match n {
-        0 => Some(MultiPatchParttype::TriangleStrip),
-        1 => Some(MultiPatchParttype::TriangleFan),
-        2 => Some(MultiPatchParttype::OuterRing),
-        3 => Some(MultiPatchParttype::FirstRing),
-        5 => Some(MultiPatchParttype::Ring),
+        0 => Some(MultiPatchPartType::TriangleStrip),
+        1 => Some(MultiPatchPartType::TriangleFan),
+        2 => Some(MultiPatchPartType::OuterRing),
+        3 => Some(MultiPatchPartType::FirstRing),
+        5 => Some(MultiPatchPartType::Ring),
         _ => None
     }
 }
