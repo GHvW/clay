@@ -44,7 +44,7 @@ impl Endian {
     }
 }
 
-
+// TODO - this is probably unnecessary, do further testing.
 pub fn determine_system_endianness(bytes: [u8; 4]) -> Option<Endian> {
     let file_code = 9994;
 
