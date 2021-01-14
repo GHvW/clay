@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::array::TryFromSliceError;
 
+#[derive(Debug, Eq, PartialEq)]
 pub enum Endian {
     Big,
     Little
@@ -43,6 +44,18 @@ impl Endian {
     }
 }
 
+
+pub fn determine_system_endianness(bytes: [u8; 4]) -> Option<Endian> {
+    let file_code = 9994;
+
+    if i32::from_be_bytes(bytes) == file_code {
+        Some(Endian::Big)
+    } else if i32::from_le_bytes(bytes) == file_code {
+        Some(Endian::Little)
+    } else {
+        None
+    }
+}
 
 
 #[cfg(test)]
@@ -145,6 +158,34 @@ mod tests {
 
         let expected =  12345.6789;
         assert_eq!(result, expected);
+    }
+
+
+    #[test]
+    fn when_system_is_little_endian_returns_lttle() {
+        let bytes = [0b00001010, 0b00100111, 0b00000000, 0b00000000];
+
+        let endianness = determine_system_endianness(bytes).unwrap();
+
+        assert_eq!(Endian::Little, endianness);       
+    }
+
+    #[test]
+    fn when_system_is_big_endian_returns_bit() {
+        let bytes = [0b00000000, 0b00000000, 0b00100111, 0b00001010];
+
+        let endianness = determine_system_endianness(bytes).unwrap();
+
+        assert_eq!(Endian::Big, endianness);
+    }
+
+    #[test]
+    fn none_when_bytes_dont_equal_file_code_little_or_big_endian() {
+        let bytes = [0b01001000, 0b00100000, 0b00100111, 0b00001010];
+
+        let endianness = determine_system_endianness(bytes);
+
+        assert_eq!(None, endianness);
     }
 }
 
