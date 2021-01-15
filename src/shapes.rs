@@ -10,6 +10,12 @@ pub struct Point {
     pub y: f64
 }
 
+impl Point {
+    pub fn new(x: f64, y: f64) -> Self {
+        Self { x, y }
+    }
+}
+
 pub struct MultiPoint {
     pub bounding_box: BoundingBox,
     pub points_count: i32,

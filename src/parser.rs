@@ -198,39 +198,43 @@ impl<P: Parser> Take<P> {
     }
 }
 
-// impl<P: Parser> Parser for Take<P> {
-//     type Out = Vec<<P as Parser>::Out>;
+impl<P: Parser> Parser for Take<P> {
+    type Out = Vec<<P as Parser>::Out>;
 
-//     fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
-//         let init = Zero::<<P as Parser>::Out>::new().bind(|item| Return::new(item));
-//         (0..self.count)
-//             .map(|_| self.parser)
-//             .fold(init, |result, parser| {
-//                 result.bind(|vec| {
-//                     parser.bind(|item| {
-//                         vec.push(item);
-//                         vec
-//                     })
-//                 })
-//             });
-//     }
-// }
-
-pub struct PointP<P> {
-    parser: P
-}
-
-impl<P: Parser> PointP<P> {
-    pub fn new(parser: P) -> Self {
-        Self { parser }
+    fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
+        let init = Zero::<<P as Parser>::Out>::new().bind(|item| Return::new(item));
+        (0..self.count)
+            .map(|_| self.parser)
+            .fold(init, |result, parser| {
+                result.bind(|vec| {
+                    parser.bind(|item| {
+                        vec.push(item);
+                        vec
+                    })
+                })
+            })
     }
 }
 
-impl<P: Parser> Parser for PointP<P> {
+pub struct PointP {}
+
+impl PointP {
+    pub fn new() -> Self {
+        Self { }
+    }
+}
+
+impl Parser for PointP {
     type Out = Point;
 
     fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
-        
+        DoubleItem::new(Endian::Big)
+            .bind(|item| {
+                DoubleItem::new(Endian::Big)
+                    .bind(move |item2| {
+                        Return::new(Point::new(item, item2))
+                    })
+            }).call(bytes)
     }
 }
 
@@ -247,6 +251,19 @@ mod tests {
         let (result, _) = 
             IntItem::new(Endian::Big)
                 .map(|x| x + 9)
+                .call(&stuff)
+                .unwrap();
+
+        assert_eq!(9009, result);
+    }
+
+    #[test]
+    fn bind_test() {
+        let stuff = [0b00000000, 0b00000000, 0b00100011, 0b00101000];
+
+        let (result, _) = 
+            IntItem::new(Endian::Big)
+                .bind(|x| Return::new(x + 9))
                 .call(&stuff)
                 .unwrap();
 
