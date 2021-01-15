@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::array::TryFromSliceError;
 use crate::endian::Endian;
+use crate::shapes::Point;
 
 pub trait Parser {
     type Out;
@@ -44,6 +45,43 @@ where
     }
 }
 
+
+pub struct Bind<P, F> {
+    parser: P,
+    func: F
+}
+
+impl<P, F, Q> Bind<P, F> 
+where
+    P: Parser,
+    Q: Parser,
+    F: Fn(<P as Parser>::Out) -> Q,
+{
+    pub fn new(parser: P, func: F) -> Self {
+        Self {
+            parser,
+            func
+        }
+    }
+}
+
+impl<P, F, Q> Parser for Bind<P, F> 
+where
+    P: Parser,
+    Q: Parser,
+    F: Fn(<P as Parser>::Out) -> Q
+{
+    type Out = <Q as Parser>::Out;
+
+    fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
+        let f = self.func;
+        self.parser.call(bytes).and_then(|(a, b)| {
+            f(a).call(b)
+        })
+    }
+}
+
+
 pub trait ParserOps : Parser {
 
     fn map<F, A>(self, func: F) -> Map<Self, F>
@@ -53,7 +91,17 @@ pub trait ParserOps : Parser {
     {
         Map::new(self, func)
     }
+
+    fn bind<F, P>(self, func: F) -> Bind<Self, F>
+    where
+        Self: Sized,
+        P: Parser,
+        F: Fn(Self::Out) -> P
+    {
+        Bind::new(self, func)
+    }
 }
+
 
 impl<P: Parser> ParserOps for P {}
 
@@ -67,6 +115,7 @@ impl<A> Zero<A> {
         Self { phantom: std::marker::PhantomData } 
     }
 }
+
 impl<A> Parser for Zero<A> {
     type Out = A;
 
@@ -137,6 +186,56 @@ impl Parser for DoubleItem {
 }
 
 
+
+pub struct Take<P: Parser> {
+    count: i32,
+    parser: P
+}
+
+impl<P: Parser> Take<P> {
+    pub fn new(count: i32, parser: P) -> Self {
+        Self { count, parser }
+    }
+}
+
+// impl<P: Parser> Parser for Take<P> {
+//     type Out = Vec<<P as Parser>::Out>;
+
+//     fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
+//         let init = Zero::<<P as Parser>::Out>::new().bind(|item| Return::new(item));
+//         (0..self.count)
+//             .map(|_| self.parser)
+//             .fold(init, |result, parser| {
+//                 result.bind(|vec| {
+//                     parser.bind(|item| {
+//                         vec.push(item);
+//                         vec
+//                     })
+//                 })
+//             });
+//     }
+// }
+
+pub struct PointP<P> {
+    parser: P
+}
+
+impl<P: Parser> PointP<P> {
+    pub fn new(parser: P) -> Self {
+        Self { parser }
+    }
+}
+
+impl<P: Parser> Parser for PointP<P> {
+    type Out = Point;
+
+    fn call(self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
+        
+    }
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -145,7 +244,11 @@ mod tests {
     fn map_test() {
         let stuff = [0b00000000, 0b00000000, 0b00100011, 0b00101000];
 
-        let (result, _) = IntItem::new(Endian::Big).map(|x| x + 9).call(&stuff).unwrap();
+        let (result, _) = 
+            IntItem::new(Endian::Big)
+                .map(|x| x + 9)
+                .call(&stuff)
+                .unwrap();
 
         assert_eq!(9009, result);
     }
