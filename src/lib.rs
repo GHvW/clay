@@ -5,7 +5,7 @@ pub mod shape_type;
 pub mod shapes;
 pub mod multi_patch_part_type;
 pub mod main_file_header;
-pub mod parser;
+pub mod play;
 
 // #![warn(clippy::all)]
 // #[wasm_bindgen]

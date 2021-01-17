@@ -1,10 +1,11 @@
 use std::io::prelude::*;
 use std::fs::File;
-use std::convert::TryInto;
+// use std::convert::TryInto;
 
 extern crate clay;
 
 // examples in rust http://xion.io/post/code/rust-examples.html
+// run with cargo run --example main
 
 fn main() {
     println!("Hello, world!");
@@ -20,12 +21,21 @@ fn main() {
         .read_to_end(&mut buffer)
         .expect("Error reading bytes into buffer");
 
-    println!("size of shapefile is {} bytes", buffer.len());
+    println!("size of shapefile is {} bytes", &buffer.len());
 
-    let initial: [u8; 4] = 
-        buffer[0..4]
-            .try_into()
-            .unwrap();
+    // let initial: [u8; 4] = 
+    //     buffer[0..4]
+    //         .try_into()
+    //         .unwrap();
 
-    println!("system endianness is {:?}", clay::endian::determine_system_endianness(initial).unwrap());
+    // println!("file code is {:?}", i32::from_be_bytes(initial));
+
+    let main = clay::play::read_main_file_header(&buffer).unwrap();
+    println!("the main file bytes: {:?}", main);
+
+    let versiontype = clay::play::read_version_and_shape_type(&buffer).unwrap();
+    println!("version and shapetype is: {:?}", versiontype);
+
+    let bounds = clay::play::read_bounds(&buffer).unwrap();
+    println!("bounds are {:?}", bounds);
 }

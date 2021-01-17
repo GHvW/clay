@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct BoundingBox {
     pub x_min: f64,
     pub y_min: f64,
@@ -5,6 +6,7 @@ pub struct BoundingBox {
     pub y_max: f64
 }
 
+#[derive(Debug)]
 pub struct Point {
     pub x: f64,
     pub y: f64
@@ -16,6 +18,7 @@ impl Point {
     }
 }
 
+#[derive(Debug)]
 pub struct MultiPoint {
     pub bounding_box: BoundingBox,
     pub points_count: i32,

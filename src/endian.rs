@@ -1,6 +1,22 @@
 use std::convert::TryInto;
 use std::array::TryFromSliceError;
 
+
+pub enum DataSize {
+    Int,
+    Double
+}
+
+impl DataSize {
+    pub fn size(&self) -> usize {
+        match self {
+            DataSize::Int => 4,
+            DataSize::Double => 8
+        }
+    }
+}
+
+
 #[derive(Debug, Eq, PartialEq)]
 pub enum Endian {
     Big,
@@ -24,6 +40,23 @@ impl Endian {
         }
     }
 
+    pub fn convert_int(&self, start: usize, bytes: &[u8]) -> Result<i32, TryFromSliceError> {
+        bytes[start..(start + 4)] // & here automagically derefed by .try_into?
+            .try_into()
+            .map(|int_bytes| {
+                self.convert_int32(int_bytes)
+            })
+    }
+
+    pub fn convert_double(&self, start: usize, bytes: &[u8]) -> Result<f64, TryFromSliceError> {
+        bytes[start..(start + 8)] // & here automagically derefed by .try_into?
+            .try_into()
+            .map(|double_bytes| {
+                self.convert_f64(double_bytes)
+            })
+    }
+
+
     // TODO - refactor these readers later to use one algo? factor out to be able to map over it instead?
     pub fn read_int<'a>(&self, bytes: &'a[u8]) -> Result<(i32, &'a[u8]), TryFromSliceError> {
         bytes[0..4] // & here automagically derefed by .try_into?
@@ -44,16 +77,37 @@ impl Endian {
     }
 }
 
-// TODO - this is probably unnecessary, do further testing.
-pub fn determine_system_endianness(bytes: [u8; 4]) -> Option<Endian> {
-    let file_code = 9994;
 
-    if i32::from_be_bytes(bytes) == file_code {
-        Some(Endian::Big)
-    } else if i32::from_le_bytes(bytes) == file_code {
-        Some(Endian::Little)
-    } else {
-        None
+pub trait BytesReader<A> {
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<A, TryFromSliceError>;
+}
+
+
+pub struct DataOps {
+    pub data_size: DataSize,
+    pub endian: Endian
+}
+
+impl BytesReader<i32> for DataOps {
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<i32, TryFromSliceError> {
+         bytes[start..(start + 4)] // & here automagically derefed by .try_into?
+            .try_into()
+            .map(|int_bytes| {
+                self.endian.convert_int32(int_bytes)
+            })       
+    }
+}
+
+impl BytesReader<f64> for DataOps {
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<f64, TryFromSliceError> {
+         bytes[start..(start + 8)] // & here automagically derefed by .try_into?
+            .try_into()
+            .map(|double_bytes| {
+                self.endian.convert_f64(double_bytes)
+            })       
     }
 }
 
@@ -161,31 +215,31 @@ mod tests {
     }
 
 
-    #[test]
-    fn when_system_is_little_endian_returns_lttle() {
-        let bytes = [0b00001010, 0b00100111, 0b00000000, 0b00000000];
+    // #[test]
+    // fn when_system_is_little_endian_returns_lttle() {
+    //     let bytes = [0b00001010, 0b00100111, 0b00000000, 0b00000000];
 
-        let endianness = determine_system_endianness(bytes).unwrap();
+    //     let endianness = determine_system_endianness(bytes).unwrap();
 
-        assert_eq!(Endian::Little, endianness);       
-    }
+    //     assert_eq!(Endian::Little, endianness);       
+    // }
 
-    #[test]
-    fn when_system_is_big_endian_returns_bit() {
-        let bytes = [0b00000000, 0b00000000, 0b00100111, 0b00001010];
+    // #[test]
+    // fn when_system_is_big_endian_returns_bit() {
+    //     let bytes = [0b00000000, 0b00000000, 0b00100111, 0b00001010];
 
-        let endianness = determine_system_endianness(bytes).unwrap();
+    //     let endianness = determine_system_endianness(bytes).unwrap();
 
-        assert_eq!(Endian::Big, endianness);
-    }
+    //     assert_eq!(Endian::Big, endianness);
+    // }
 
-    #[test]
-    fn none_when_bytes_dont_equal_file_code_little_or_big_endian() {
-        let bytes = [0b01001000, 0b00100000, 0b00100111, 0b00001010];
+    // #[test]
+    // fn none_when_bytes_dont_equal_file_code_little_or_big_endian() {
+    //     let bytes = [0b01001000, 0b00100000, 0b00100111, 0b00001010];
 
-        let endianness = determine_system_endianness(bytes);
+    //     let endianness = determine_system_endianness(bytes);
 
-        assert_eq!(None, endianness);
-    }
+    //     assert_eq!(None, endianness);
+    // }
 }
 
