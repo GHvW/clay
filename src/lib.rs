@@ -6,6 +6,7 @@ pub mod shapes;
 pub mod multi_patch_part_type;
 pub mod main_file_header;
 pub mod play;
+pub mod primitive_metadata;
 
 // #![warn(clippy::all)]
 // #[wasm_bindgen]

@@ -2,21 +2,6 @@ use std::convert::TryInto;
 use std::array::TryFromSliceError;
 
 
-pub enum DataSize {
-    Int,
-    Double
-}
-
-impl DataSize {
-    pub fn size(&self) -> usize {
-        match self {
-            DataSize::Int => 4,
-            DataSize::Double => 8
-        }
-    }
-}
-
-
 #[derive(Debug, Eq, PartialEq)]
 pub enum Endian {
     Big,
@@ -77,39 +62,6 @@ impl Endian {
     }
 }
 
-
-pub trait BytesReader<A> {
-
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<A, TryFromSliceError>;
-}
-
-
-pub struct DataOps {
-    pub data_size: DataSize,
-    pub endian: Endian
-}
-
-impl BytesReader<i32> for DataOps {
-
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<i32, TryFromSliceError> {
-         bytes[start..(start + 4)] // & here automagically derefed by .try_into?
-            .try_into()
-            .map(|int_bytes| {
-                self.endian.convert_int32(int_bytes)
-            })       
-    }
-}
-
-impl BytesReader<f64> for DataOps {
-
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<f64, TryFromSliceError> {
-         bytes[start..(start + 8)] // & here automagically derefed by .try_into?
-            .try_into()
-            .map(|double_bytes| {
-                self.endian.convert_f64(double_bytes)
-            })       
-    }
-}
 
 
 #[cfg(test)]

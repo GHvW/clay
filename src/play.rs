@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 
-use crate::endian::{ Endian, DataSize, DataOps, BytesReader };
+// use crate::endian::{ Endian };
+use crate::primitive_metadata::{ PrimitiveMetadata, MetadataOps };
 use crate::shapes::Point;
 
 
@@ -58,27 +59,29 @@ pub fn read_bounds(bytes: &[u8]) -> Option<Vec<f64>> {
 //         .zip(gen_intervals())
 // }
 
-
-pub struct Reader {
-    data_ops: DataOps,
+#[derive(Debug)]
+pub struct ByteReader<A> {
+    primitive_metadata: PrimitiveMetadata<A>,
     read_count: usize,
     start_byte: usize,
 }
 
-impl Reader {
-    pub fn new(data_ops: DataOps, read_count: usize, start_byte: usize) -> Self {
+impl<A> ByteReader<A> {
+    pub fn new(primitive_metadata: PrimitiveMetadata<A>, read_count: usize, start_byte: usize) -> Self {
         Self {
-            data_ops,
+            primitive_metadata,
             read_count,
             start_byte,
         }
     }
 
     pub fn read(&self, bytes: &[u8]) -> Option<Vec<f64>> {
+        println!("");
         (0..self.read_count)
-            .zip(gen_intervals(self.start_byte, self.read_count, self.data_ops.data_size.size()))
+            .zip(gen_intervals(self.start_byte, self.read_count, self.primitive_metadata.size()))
+            .inspect(|(i, start)| println!("index is {}, start is {}", i, start))
             .map(|(_, start)| {
-                self.data_ops
+                self.primitive_metadata
                     .read(start, bytes)
                     .ok()
             })
@@ -86,31 +89,3 @@ impl Reader {
     }
 }
 
-
-pub struct DoubleReader {
-    read_count: usize,
-    start_byte: usize,
-    endian: Endian
-}
-
-impl DoubleReader {
-    pub fn new(read_count: usize, start_byte: usize, endian: Endian) -> Self {
-        Self {
-            read_count,
-            start_byte,
-            endian
-        }
-    }
-
-    pub fn read(&self, bytes: &[u8]) -> Option<Vec<f64>> {
-        (0..self.read_count)
-            .zip(gen_intervals(self.start_byte, self.read_count, 8))
-            .map(|(_, start)| {
-                self.endian
-                    .convert_double(start, bytes)
-                    .ok()
-            })
-            .collect()
-    }
-}
-// pub fn read_polygon() -> Vec<>
