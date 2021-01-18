@@ -23,15 +23,16 @@ impl DataSize {
 pub trait DataOps {
     type Out;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError>;
+    // fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError>;
+    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out>;
     fn size(&self) -> usize;
 }
 
-#[derive(Debug)]
-pub struct PrimitiveMetadata {
-    pub data_size: DataSize,
-    pub endian: Endian,
-}
+// #[derive(Debug)]
+// pub struct PrimitiveMetadata {
+//     pub data_size: DataSize,
+//     pub endian: Endian,
+// }
 
 // impl<A> PrimitiveMetadata {
 //     pub fn new(data_size: DataSize, endian: Endian) -> Self {
@@ -59,13 +60,14 @@ impl ReadInt {
 impl DataOps for ReadInt {
     type Out = i32;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
-        println!("reading int");
+    // fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
+    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
         bytes[start..(start + 4)] 
             .try_into()
             .map(|int_bytes| {
                 self.endian.convert_int32(int_bytes)
-            })       
+            })
+            .ok()
     }
 
     fn size(&self) -> usize {
@@ -89,13 +91,14 @@ impl ReadDouble {
 impl DataOps for ReadDouble {
     type Out = f64;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
-        println!("reading double");
+    // fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
+    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
         bytes[start..(start + 8)] 
             .try_into()
             .map(|double_bytes| {
                 self.endian.convert_f64(double_bytes)
-            })       
+            })
+            .ok() 
     }
 
     fn size(&self) -> usize {

@@ -9,6 +9,7 @@ pub mod play;
 pub mod primitive_readers;
 pub mod byte_reader;
 pub mod util;
+pub mod shape_readers;
 
 // #![warn(clippy::all)]
 // #[wasm_bindgen]
