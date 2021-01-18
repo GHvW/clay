@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 // use crate::endian::{ Endian };
-use crate::primitive_metadata::{ PrimitiveMetadata, DataOps };
+use crate::primitive_readers::{ PrimitiveMetadata, DataOps };
 use crate::shapes::Point;
 
 
