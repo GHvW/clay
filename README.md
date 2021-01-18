@@ -1,1 +1,3 @@
 # clay
+
+A Shapefile reader.

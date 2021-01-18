@@ -45,7 +45,7 @@ fn main() {
     // let little = clay::endian::Endian::Little;
     let big = clay::endian::Endian::Big;
 
-    let main_header_metadata = clay::primitive_metadata::PrimitiveMetadata::new(int, big);
+    let main_header_metadata = clay::primitive_metadata::ReadInt::new(big);
 
     let main_reader = clay::play::ByteReader::new(main_header_metadata, 7, 0);
 

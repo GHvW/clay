@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 // use crate::endian::{ Endian };
-use crate::primitive_metadata::{ PrimitiveMetadata, MetadataOps };
+use crate::primitive_metadata::{ PrimitiveMetadata, DataOps };
 use crate::shapes::Point;
 
 
@@ -60,28 +60,29 @@ pub fn read_bounds(bytes: &[u8]) -> Option<Vec<f64>> {
 // }
 
 #[derive(Debug)]
-pub struct ByteReader<A> {
-    primitive_metadata: PrimitiveMetadata<A>,
+pub struct ByteReader<A: DataOps + Sized> {
+    // primitive_metadata: std::marker::PhantomData<A>,
+    ops: A,
     read_count: usize,
     start_byte: usize,
 }
 
-impl<A> ByteReader<A> {
-    pub fn new(primitive_metadata: PrimitiveMetadata<A>, read_count: usize, start_byte: usize) -> Self {
+impl<A: DataOps + Sized> ByteReader<A> {
+    pub fn new(ops: A, read_count: usize, start_byte: usize) -> Self {
         Self {
-            primitive_metadata,
+            ops,
             read_count,
             start_byte,
         }
     }
 
-    pub fn read(&self, bytes: &[u8]) -> Option<Vec<f64>> {
+    pub fn read(&self, bytes: &[u8]) -> Option<Vec<<A as DataOps>::Out>> {
         println!("");
         (0..self.read_count)
-            .zip(gen_intervals(self.start_byte, self.read_count, self.primitive_metadata.size()))
+            .zip(gen_intervals(self.start_byte, self.read_count, self.ops.size()))
             .inspect(|(i, start)| println!("index is {}, start is {}", i, start))
             .map(|(_, start)| {
-                self.primitive_metadata
+                self.ops
                     .read(start, bytes)
                     .ok()
             })

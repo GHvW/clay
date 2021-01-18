@@ -20,32 +20,46 @@ impl DataSize {
 
 
 
-pub trait MetadataOps<A> {
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<A, TryFromSliceError>;
+pub trait DataOps {
+    type Out;
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError>;
     fn size(&self) -> usize;
 }
 
 #[derive(Debug)]
-pub struct PrimitiveMetadata<A> {
-    // pub data_size: DataSize,
+pub struct PrimitiveMetadata {
+    pub data_size: DataSize,
     pub endian: Endian,
-    phantom: std::marker::PhantomData<A>
 }
 
-impl<A> PrimitiveMetadata<A> {
-    // pub fn new(data_size: DataSize, endian: Endian) -> Self {
-    pub fn new(endian: Endian, phantom: std::marker::PhantomData<A>) -> Self {
-        Self {
-            // data_size,
-            endian,
-            phantom
-        }
+// impl<A> PrimitiveMetadata {
+//     pub fn new(data_size: DataSize, endian: Endian) -> Self {
+//     // pub fn new(data_size: DataSize, endian: Endian, phantom: std::marker::PhantomData<A>) -> Self {
+//         Self {
+//             data_size,
+//             endian,
+//             // phantom
+//         }
+//     }
+// }
+
+#[derive(Debug)]
+pub struct ReadInt {
+    endian: Endian
+}
+
+impl ReadInt {
+    pub fn new(endian: Endian) -> Self {
+        Self { endian }
     }
 }
 
-impl MetadataOps<i32> for PrimitiveMetadata<i32> {
+// impl MetadataOps<i32> for PrimitiveMetadata<i32> {
+impl DataOps for ReadInt {
+    type Out = i32;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<i32, TryFromSliceError> {
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
         println!("reading int");
         bytes[start..(start + 4)] 
             .try_into()
@@ -55,13 +69,27 @@ impl MetadataOps<i32> for PrimitiveMetadata<i32> {
     }
 
     fn size(&self) -> usize {
+        // self.data_size.size()
         4
     }
 }
 
-impl MetadataOps<f64> for PrimitiveMetadata<f64> {
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Result<f64, TryFromSliceError> {
+#[derive(Debug)]
+pub struct ReadDouble {
+    endian: Endian
+}
+
+impl ReadDouble {
+    pub fn new(endian: Endian) -> Self { 
+        Self { endian } 
+    }
+}
+
+impl DataOps for ReadDouble {
+    type Out = f64;
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
         println!("reading double");
         bytes[start..(start + 8)] 
             .try_into()
@@ -71,7 +99,7 @@ impl MetadataOps<f64> for PrimitiveMetadata<f64> {
     }
 
     fn size(&self) -> usize {
+        // self.data_size.size()
         8
     }
 }
-
