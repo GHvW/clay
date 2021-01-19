@@ -7,9 +7,9 @@ use crate::shapes::BoundingBox;
 
 
 pub struct PolygonStats {
-    bounds_box: Vec<f64>,
-    parts_count: i32,
-    points_count: i32
+    pub bounds_box: Vec<f64>,
+    pub parts_count: i32,
+    pub points_count: i32
 }
 
 impl PolygonStats {

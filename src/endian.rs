@@ -69,7 +69,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn convert_big_endian_int_perfect_size_test() {
+    fn read_big_endian_int_perfect_size_test() {
         let initial = [0b00100001, 0b00100001, 0b11110111, 0b10111110];
 
         // let result = convert_int(Endian::Big, &initial).unwrap().0;
@@ -80,11 +80,32 @@ mod tests {
     }
 
     #[test]
-    fn convert_big_endian_int_with_extra_bytes_test() {
+    fn convert_big_endian_int_perfect_size_test() {
+        let initial = [0b00100001, 0b00100001, 0b11110111, 0b10111110];
+
+        let result = Endian::Big.convert_int(0, &initial).unwrap();
+
+        let expected =  555_874_238;
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn read_big_endian_int_with_extra_bytes_test() {
         let initial = [0b00100001, 0b00100001, 0b11110111, 0b10111110, 0b00110001, 0b00100011, 0b11110011, 0b10011110];
 
         // let (result, _) = convert_int(Endian::Big, &initial).unwrap();
         let (result, _) = Endian::Big.read_int(&initial).unwrap();
+
+        let expected =  555_874_238;
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn convert_big_endian_int_with_extra_bytes_test() {
+        let initial = [0b00100001, 0b00100001, 0b11110111, 0b10111110, 0b00110001, 0b00100011, 0b11110011, 0b10011110];
+
+        // let (result, _) = convert_int(Endian::Big, &initial).unwrap();
+        let result = Endian::Big.convert_int(0, &initial).unwrap();
 
         let expected =  555_874_238;
         assert_eq!(result, expected);
@@ -104,7 +125,7 @@ mod tests {
 
 
     #[test]
-    fn convert_little_endian_int_perfect_size_test() {
+    fn read_little_endian_int_perfect_size_test() {
         let initial = [0b10111110, 0b11110111, 0b00100001, 0b00100001];
 
         let result = Endian::Little.read_int(&initial).unwrap().0;
@@ -113,13 +134,50 @@ mod tests {
         assert_eq!(result, expected);
     }
 
+    #[test]
+    fn convert_little_endian_int_perfect_size_test() {
+        let initial = [0b10111110, 0b11110111, 0b00100001, 0b00100001];
+
+        let result = Endian::Little.convert_int(0, &initial).unwrap();
+
+        let expected =  555_874_238;
+        assert_eq!(result, expected);
+    }
+
 
     // ************************* double tests **********************
+    #[test]
+    fn read_big_endian_double_perfect_size() {
+        // 12345.6789
+        // [64, 200, 28, 214, 230, 49, 248, 161]
+        let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001];
+
+        let result = Endian::Big.read_double(&initial).unwrap().0;
+
+        let expected =  12345.6789;
+        assert_eq!(result, expected);
+    }
+
+
     #[test]
     fn convert_big_endian_double_perfect_size() {
         // 12345.6789
         // [64, 200, 28, 214, 230, 49, 248, 161]
         let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001];
+
+        let result = Endian::Big.convert_double(0, &initial).unwrap();
+
+        let expected =  12345.6789;
+        assert_eq!(result, expected);
+    }
+
+
+    #[test]
+    fn read_big_endian_double_extra_bytes() {
+        // 12345.6789
+        // [64, 200, 28, 214, 230, 49, 248, 161]
+        let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
+        0b01001100, 0b11011100, 0b01011100, 0b11000100, 0b10100110, 0b00110101, 0b11011000, 0b10101001];
 
         let result = Endian::Big.read_double(&initial).unwrap().0;
 
@@ -135,7 +193,7 @@ mod tests {
         let initial = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
         0b01001100, 0b11011100, 0b01011100, 0b11000100, 0b10100110, 0b00110101, 0b11011000, 0b10101001];
 
-        let result = Endian::Big.read_double(&initial).unwrap().0;
+        let result = Endian::Big.convert_double(0, &initial).unwrap();
 
         let expected =  12345.6789;
         assert_eq!(result, expected);
@@ -157,7 +215,7 @@ mod tests {
 
 
     #[test]
-    fn convert_little_endian_double_perfect_size() {
+    fn read_little_endian_double_perfect_size() {
         let initial = [0b10100001, 0b11111000, 0b00110001, 0b11100110, 0b11010110, 0b00011100, 0b11001000, 0b01000000];
 
         let result = Endian::Little.read_double(&initial).unwrap().0;
@@ -166,6 +224,16 @@ mod tests {
         assert_eq!(result, expected);
     }
 
+
+    #[test]
+    fn convert_little_endian_double_perfect_size() {
+        let initial = [0b10100001, 0b11111000, 0b00110001, 0b11100110, 0b11010110, 0b00011100, 0b11001000, 0b01000000];
+
+        let result = Endian::Little.convert_double(0, &initial).unwrap();
+
+        let expected =  12345.6789;
+        assert_eq!(result, expected);
+    }
 
     // #[test]
     // fn when_system_is_little_endian_returns_lttle() {
