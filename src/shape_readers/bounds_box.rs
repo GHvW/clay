@@ -29,3 +29,32 @@ impl DataOps for BoxR {
         self.byte_reader.size()
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // use crate::primitive_readers::ReadDouble;
+    use crate::endian::Endian;
+
+    #[test]
+    fn box_reader_reads_4_doubles() {
+        // [64, 200, 28, 214, 230, 49, 248, 161] - 12345.6789
+        // [64, 234, 134, 63, 154, 107, 80, 177] - 54321.9876
+        // [64, 64, 185, 153, 153, 153, 153, 154] - 33.45
+        // [64, 83, 191, 92, 40, 245, 194, 143] - 78.99
+        let bytes = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
+                     0b01000000, 0b11101010, 0b10000110, 0b00111111, 0b10011010, 0b01101011, 0b01010000, 0b10110001,
+                     0b01000000, 0b01000000, 0b10111001, 0b10011001, 0b10011001, 0b10011001, 0b10011001, 0b10011010,
+                     0b01000000, 0b01010011, 0b10111111, 0b01011100, 0b00101000, 0b11110101, 0b11000010, 0b10001111];
+
+        let double_reader = ReadDouble::new(Endian::Big);
+        let box_reader = BoxR::new(double_reader);
+
+        let expected = vec![12345.6789, 54321.9876, 33.45, 78.99];
+
+        let actual = box_reader.read(0, &bytes).unwrap();
+
+        assert_eq!(expected, actual);
+    }
+}
