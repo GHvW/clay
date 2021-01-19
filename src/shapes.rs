@@ -6,7 +6,7 @@ pub struct BoundingBox {
     pub y_max: f64
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Point {
     pub x: f64,
     pub y: f64
