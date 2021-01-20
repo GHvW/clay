@@ -46,9 +46,9 @@ fn main() {
     // let little = clay::endian::Endian::Little;
     let big = clay::endian::Endian::Big;
 
-    let main_header_metadata = clay::primitive_readers::ReadInt::new(big);
+    let main_header_metadata = clay::primitive_readers::ReadInt::new(&big);
 
-    let main_reader = clay::byte_reader::ByteReader::new(main_header_metadata, 7);
+    let main_reader = clay::byte_reader::ByteReader::new(&main_header_metadata, 7);
 
     println!("main reader is: {:?}", &main_reader);
     println!("did this work? {:?}", main_reader.read(0, &buffer).unwrap());

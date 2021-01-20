@@ -2,23 +2,20 @@ use crate::byte_reader::{ ByteReader };
 use crate::primitive_readers::{ ReadDouble, DataOps };
 use crate::shapes::BoundingBox;
 
-pub fn bounding_box_reader(ops: ReadDouble) -> ByteReader<ReadDouble> {
-    ByteReader::new(ops, 4)
+
+pub struct BoxR<'a> {
+    byte_reader: ByteReader<'a, ReadDouble<'a>>
 }
 
-pub struct BoxR {
-    byte_reader: ByteReader<ReadDouble>
-}
-
-impl BoxR {
-    pub fn new(ops: ReadDouble) -> Self {
+impl<'a> BoxR<'a> {
+    pub fn new(ops: &'a ReadDouble) -> Self {
         Self {
             byte_reader: ByteReader::new(ops, 4)
         }
     }
 }
 
-impl DataOps for BoxR {
+impl<'a> DataOps for BoxR<'a> {
     type Out = BoundingBox;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -50,8 +47,8 @@ mod tests {
                      0b01000000, 0b01000000, 0b10111001, 0b10011001, 0b10011001, 0b10011001, 0b10011001, 0b10011010,
                      0b01000000, 0b01010011, 0b10111111, 0b01011100, 0b00101000, 0b11110101, 0b11000010, 0b10001111];
 
-        let double_reader = ReadDouble::new(Endian::Big);
-        let box_reader = BoxR::new(double_reader);
+        let double_reader = ReadDouble::new(&Endian::Big);
+        let box_reader = BoxR::new(&double_reader);
 
         // let expected = vec![12345.6789, 54321.9876, 33.45, 78.99];
         let expected = BoundingBox::new(12345.6789, 54321.9876, 33.45, 78.99);
@@ -74,8 +71,8 @@ mod tests {
                      0b01000000, 0b01010011, 0b10111111, 0b01011100, 0b00101000, 0b11110101, 0b11000010, 0b10001111,
                      0b11111111];
 
-        let double_reader = ReadDouble::new(Endian::Big);
-        let box_reader = BoxR::new(double_reader);
+        let double_reader = ReadDouble::new(&Endian::Big);
+        let box_reader = BoxR::new(&double_reader);
 
         // let expected = vec![12345.6789, 54321.9876, 33.45, 78.99];
         let expected = BoundingBox::new(12345.6789, 54321.9876, 33.45, 78.99);

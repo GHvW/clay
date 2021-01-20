@@ -1,5 +1,4 @@
 use std::convert::TryInto;
-use std::array::TryFromSliceError;
 
 use crate::endian::Endian;
 
@@ -46,18 +45,18 @@ pub trait DataOps {
 // }
 
 #[derive(Debug)]
-pub struct ReadInt {
-    endian: Endian
+pub struct ReadInt<'a> {
+    endian: &'a Endian
 }
 
-impl ReadInt {
-    pub fn new(endian: Endian) -> Self {
+impl<'a> ReadInt<'a> {
+    pub fn new(endian: &'a Endian) -> Self {
         Self { endian }
     }
 }
 
 // impl MetadataOps<i32> for PrimitiveMetadata<i32> {
-impl DataOps for ReadInt {
+impl<'a> DataOps for ReadInt<'a> {
     type Out = i32;
 
     // fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {
@@ -78,17 +77,17 @@ impl DataOps for ReadInt {
 
 
 #[derive(Debug)]
-pub struct ReadDouble {
-    endian: Endian
+pub struct ReadDouble<'a> {
+    endian: &'a Endian
 }
 
-impl ReadDouble {
-    pub fn new(endian: Endian) -> Self { 
+impl<'a> ReadDouble<'a> {
+    pub fn new(endian: &'a Endian) -> Self { 
         Self { endian } 
     }
 }
 
-impl DataOps for ReadDouble {
+impl<'a> DataOps for ReadDouble<'a> {
     type Out = f64;
 
     // fn read(&self, start: usize, bytes: &[u8]) -> Result<Self::Out, TryFromSliceError> {

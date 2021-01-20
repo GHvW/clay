@@ -4,15 +4,15 @@ use crate::shapes::Point;
 use crate::primitive_readers::ReadDouble;
 
 #[derive(Debug)]
-pub struct ByteReader<A: DataOps + Sized> {
-    ops: A,
+pub struct ByteReader<'a, A: DataOps + Sized + 'a> {
+    ops: &'a A,
     read_count: usize,
     // start_byte: usize,
 }
 
-impl<A: DataOps + Sized> ByteReader<A> {
+impl<'a, A: DataOps + Sized + 'a> ByteReader<'a, A> {
     // pub fn new(ops: A, read_count: usize, start_byte: usize) -> Self {
-    pub fn new (ops: A, read_count: usize) -> Self {
+    pub fn new (ops: &'a A, read_count: usize) -> Self {
         Self {
             ops,
             read_count,
@@ -33,7 +33,7 @@ impl<A: DataOps + Sized> ByteReader<A> {
     // }
 }
 
-impl<A: DataOps + Sized> DataOps for ByteReader<A> {
+impl<'a, A: DataOps + Sized> DataOps for ByteReader<'a, A> {
     type Out = Vec<<A as DataOps>::Out>;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -54,28 +54,28 @@ impl<A: DataOps + Sized> DataOps for ByteReader<A> {
 
 
 
-pub struct PointR {
-    byte_reader: ByteReader<ReadDouble>
-}
+// pub struct PointR<'a> {
+//     byte_reader: &'a ByteReader<ReadDouble>
+// }
 
-impl PointR {
-    pub fn new(byte_reader: ByteReader<ReadDouble>) -> Self {
-        Self { byte_reader }
-    }
-}
+// impl PointR {
+//     pub fn new(byte_reader: ByteReader<ReadDouble>) -> Self {
+//         Self { byte_reader }
+//     }
+// }
 
-impl DataOps for PointR {
-    type Out = Point;
+// impl DataOps for PointR {
+//     type Out = Point;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        self.byte_reader
-            .read(start, bytes)
-            .map(|vec| {
-                Point::new(vec[0], vec[1])
-            })
-    }
+//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+//         self.byte_reader
+//             .read(start, bytes)
+//             .map(|vec| {
+//                 Point::new(vec[0], vec[1])
+//             })
+//     }
 
-    fn size(&self) -> usize {
-        self.byte_reader.size()
-    }
-}
+//     fn size(&self) -> usize {
+//         self.byte_reader.size()
+//     }
+// }
