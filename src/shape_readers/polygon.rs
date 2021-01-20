@@ -39,22 +39,22 @@ impl PolygonStatsR {
     }
 }
 
-impl DataOps for PolygonStatsR {
-    type Out = PolygonStats;
+// impl DataOps for PolygonStatsR {
+//     type Out = PolygonStats;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        let box_size = self.box_reader.size();
-        let b = self.box_reader.read(start, bytes)?;
-        let f = self.int_reader.read(start + box_size, bytes)?;
-        let s = self.int_reader.read(start + box_size + 4, bytes)?;
+//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+//         let box_size = self.box_reader.size();
+//         let b = self.box_reader.read(start, bytes)?;
+//         let f = self.int_reader.read(start + box_size, bytes)?;
+//         let s = self.int_reader.read(start + box_size + 4, bytes)?;
 
-        Some(PolygonStats::new(b, f, s))
-    }
+//         Some(PolygonStats::new(b, f, s))
+//     }
 
-    fn size(&self) -> usize {
-        self.box_reader.size() + 8 // two Ints = 8 bytes
-    }
-}
+//     fn size(&self) -> usize {
+//         self.box_reader.size() + 8 // two Ints = 8 bytes
+//     }
+// }
 
 
 
@@ -94,24 +94,26 @@ pub struct PolygonR {
     point_reader: PointR
 }
 
-impl DataOps for PolygonR {
-    type Out = Polygon;
+// impl DataOps for PolygonR {
+//     type Out = Polygon;
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        let stats = self.stats_reader.read(start, bytes)?;
-        let points_reader = 
-            PolygonPointsR::new(
-                stats.parts_count, 
-                stats.points_count, 
-                self.int_reader, 
-                self.point_reader);
+//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+//         let stats = self.stats_reader.read(start, bytes)?;
 
-        let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
+//         let points_reader = 
+//             PolygonPointsR::new(
+//                 stats.parts_count, 
+//                 stats.points_count, 
+//                 self.int_reader, 
+//                 self.point_reader);
 
-        Polygon::new()
-    }
+//         let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
 
-    fn size(&self) -> usize {
-        self.point_reader.size() + self.stats_reader.size()
-    }
-}
+//         let bounds = BoundingBox::new()
+//         Some(Polygon::new(stats.bounding_box, stats.parts_count, stats.points_count, parts, points))
+//     }
+
+//     fn size(&self) -> usize {
+//         self.point_reader.size() + self.stats_reader.size()
+//     }
+// }
