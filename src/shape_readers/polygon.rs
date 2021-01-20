@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use crate::shapes::{ Point, Polygon };
 use crate::primitive_readers::{ ReadInt, ReadDouble, DataOps };
 use crate::byte_reader::ByteReader;
@@ -64,8 +66,8 @@ pub struct PolygonPointsR {
 impl PolygonPointsR {
     pub fn new(parts_count: i32, points_count: i32, int_reader: ReadInt, point_reader: PointR) -> Self {
         Self {
-            part_reader: ByteReader::new(int_reader, parts_count),
-            point_reader: ByteReader::new(point_reader, points_count)
+            part_reader: ByteReader::new(int_reader, parts_count.try_into().unwrap()),
+            point_reader: ByteReader::new(point_reader, points_count.try_into().unwrap()) // TODO better way to handle than unwrap?
         }
     }
 }
@@ -101,6 +103,6 @@ impl DataOps for PolygonR {
     }
 
     fn size(&self) -> usize {
-        self.points_reader.size() + self.stats_reader.size()
+        self.point_reader.size() + self.stats_reader.size()
     }
 }

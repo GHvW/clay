@@ -33,6 +33,7 @@ pub struct PolyLine {
     pub points: Vec<Point>
 }
 
+#[derive(Debug)]
 pub struct Polygon {
     pub bounding_box: BoundingBox,
     pub parts_count: i32,
@@ -42,9 +43,15 @@ pub struct Polygon {
 }
 
 impl Polygon {
-    pub fn new() -> Self {
+    pub fn new(bounding_box: BoundingBox, parts_count: i32, points_count: i32, parts: Vec<i32>, points: Vec<Point>) -> Self {
         // points need to come together at one point
-        unimplemented!();
+        Self {
+            bounding_box,
+            parts_count,
+            points_count,
+            parts,
+            points
+        }
     }
 }
 
