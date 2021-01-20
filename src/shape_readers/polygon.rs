@@ -99,7 +99,16 @@ impl DataOps for PolygonR {
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
         let stats = self.stats_reader.read(start, bytes)?;
-        let points_reader = PolygonPointsR::new(stats.parts_count, stats.points_count, self.int_reader, self.point_reader);
+        let points_reader = 
+            PolygonPointsR::new(
+                stats.parts_count, 
+                stats.points_count, 
+                self.int_reader, 
+                self.point_reader);
+
+        let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
+
+        Polygon::new()
     }
 
     fn size(&self) -> usize {
