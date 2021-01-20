@@ -121,6 +121,20 @@ impl<'a> DataOps for PolygonR<'a> {
 mod tests {
     use super::*;
 
-    // #[test]
+    use crate::endian::Endian;
+
+    #[test]
+    fn stats_reader_reads_stats() {
+        let bytes = [0b00000000];
+
+        let endian = Endian::Big;
+
+        let int_reader = ReadInt::new(&endian);
+        let double_reader = ReadDouble::new(&endian);
+
+        let box_reader = BoxR::new(&double_reader);
+
+        let stats_reader = PolygonStatsR::new(&box_reader, &int_reader);
+    }
 
 }
