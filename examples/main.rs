@@ -40,8 +40,6 @@ fn main() {
     let bounds = clay::play::read_bounds(&buffer).unwrap();
     println!("bounds are {:?}", bounds);
 
-    // let double = clay::primitive_metadata::DataSize::Double;
-    let int = clay::primitive_readers::DataSize::Int;
 
     // let little = clay::endian::Endian::Little;
     let big = clay::endian::Endian::Big;
@@ -52,4 +50,25 @@ fn main() {
 
     println!("main reader is: {:?}", &main_reader);
     println!("did this work? {:?}", main_reader.read(0, &buffer).unwrap());
+
+    let little = clay::endian::Endian::Little;
+
+    let little_int = clay::primitive_readers::ReadInt::new(&little);
+
+    let little_double = clay::primitive_readers::ReadDouble::new(&little);
+
+    let box_r = clay::shape_readers::bounds_box::BoxR::new(&little_double);
+
+    let point_r = clay::shape_readers::point::PointR::new(&little_double);
+
+    let stats = clay::shape_readers::polygon::PolygonStatsR::new(&box_r, &little_int);
+
+    let polygon_r = clay::shape_readers::polygon::PolygonR::new(stats, &little_int, point_r);
+
+    let polygon_record_r = clay::shape_readers::polygon::PolygonRecordR::new(&little_int, polygon_r);
+
+    let (shape_kind, poly) = polygon_record_r.read(108, &buffer).unwrap();
+
+    println!("shape type is {}", shape_kind);
+    println!("polygons: {:?}", poly);
 }
