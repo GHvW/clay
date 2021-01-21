@@ -91,8 +91,18 @@ impl<'a> DataOps for PolygonPointsR<'a> {
 
 pub struct PolygonR<'a> {
     stats_reader: PolygonStatsR<'a>,
-    int_reader: ReadInt<'a>,
+    int_reader: &'a ReadInt<'a>,
     point_reader: PointR<'a>
+}
+
+impl<'a> PolygonR<'a> {
+    pub fn new(stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt<'a>, point_reader: PointR<'a>) -> Self {
+        Self {
+            stats_reader,
+            int_reader,
+            point_reader
+        }
+    }
 }
 
 impl<'a> DataOps for PolygonR<'a> {
@@ -117,6 +127,37 @@ impl<'a> DataOps for PolygonR<'a> {
         self.point_reader.size() + self.stats_reader.size()
     }
 }
+
+
+pub struct PolygonRecordR<'a> {
+    int_reader: &'a ReadInt<'a>,
+    polygon_reader: PolygonR<'a>
+}
+
+impl<'a> PolygonRecordR<'a> {
+    pub fn new(int_reader: &'a ReadInt<'a>, polygon_reader: PolygonR<'a>) -> Self {
+        Self {
+            int_reader,
+            polygon_reader
+        }
+    }
+}
+
+impl<'a> DataOps for PolygonRecordR<'a> {
+    type Out = (i32, Polygon);
+
+    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+        let shape_type = self.int_reader.read(start, bytes)?;
+        // TODO check shape type?
+        let polygon = self.polygon_reader.read(start + self.int_reader.size(), bytes)?;
+        Some((shape_type, polygon))
+    }
+
+    fn size(&self) -> usize {
+        self.int_reader.size() + self.polygon_reader.size()
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
