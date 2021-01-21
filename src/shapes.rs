@@ -29,13 +29,16 @@ impl Point {
     }
 }
 
-#[derive(Debug)]
+
+#[derive(Debug, PartialEq)]
 pub struct MultiPoint {
     pub bounding_box: BoundingBox,
     pub points_count: i32,
     pub points: Vec<Point>
 }
 
+
+#[derive(Debug, PartialEq)]
 pub struct PolyLine {
     pub bounding_box: BoundingBox,
     pub parts_count: i32,
@@ -44,7 +47,7 @@ pub struct PolyLine {
     pub points: Vec<Point>
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Polygon {
     pub bounding_box: BoundingBox,
     pub parts_count: i32,

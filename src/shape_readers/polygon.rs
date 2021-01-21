@@ -8,6 +8,7 @@ use crate::shape_readers::bounds_box::BoxR;
 use crate::shapes::BoundingBox;
 
 
+#[derive(Debug, PartialEq)]
 pub struct PolygonStats {
     pub bounds_box: BoundingBox,
     pub parts_count: i32,
@@ -125,9 +126,17 @@ mod tests {
 
     #[test]
     fn stats_reader_reads_stats() {
-        let bytes = [0b00000000];
+        let x_min = f64::to_le_bytes(55.55);
+        let y_min = f64::to_le_bytes(88.88);
+        let x_max = f64::to_le_bytes(100.9);
+        let y_max = f64::to_le_bytes(120.2);
+        let parts_count = i32::to_le_bytes(15);
+        let points_count = i32::to_le_bytes(23);
+        let bytes = [[x_min, y_min, x_max, y_max].concat(), 
+                         [parts_count, 
+                          points_count].concat()].concat();
 
-        let endian = Endian::Big;
+        let endian = Endian::Little;
 
         let int_reader = ReadInt::new(&endian);
         let double_reader = ReadDouble::new(&endian);
@@ -135,6 +144,49 @@ mod tests {
         let box_reader = BoxR::new(&double_reader);
 
         let stats_reader = PolygonStatsR::new(&box_reader, &int_reader);
+
+        let actual = stats_reader.read(0, &bytes).unwrap();
+
+        let expected = 
+            PolygonStats::new(
+                BoundingBox::new(55.55, 88.88, 100.9, 120.2),
+                15,
+                23);
+
+        assert_eq!(expected, actual);
     }
 
+
+    #[test]
+    fn points_reader_reads_points_and_parts() {
+
+        let parts_bytes = [i32::to_le_bytes(333), i32::to_le_bytes(777)].concat();
+        let points_bytes = [f64::to_le_bytes(-100.25), f64::to_le_bytes(-150.75),
+                            f64::to_le_bytes(-75.88), f64::to_le_bytes(25.99),
+                            f64::to_le_bytes(110.11), f64::to_le_bytes(175.33),
+                            f64::to_le_bytes(144.44), f64::to_le_bytes(-55.55)].concat();
+
+        let bytes = [parts_bytes, points_bytes].concat();
+
+        let endian = Endian::Little;
+
+        let int_reader = ReadInt::new(&endian);
+        let double_reader = ReadDouble::new(&endian);
+
+        let point_reader = PointR::new(&double_reader);
+
+        let stats_reader = PolygonPointsR::new(2, 4, &int_reader, &point_reader);
+
+        let (actual_parts, actual_points) = stats_reader.read(0, &bytes).unwrap();
+
+        let expected_parts = vec![333, 777];
+
+        let expected_points = vec![Point::new(-100.25, -150.75), 
+                                   Point::new(-75.88, 25.99), 
+                                   Point::new(110.11, 175.33), 
+                                   Point::new(144.44, -55.55)];
+
+        assert_eq!(expected_parts, actual_parts);
+        assert_eq!(expected_points, actual_points);
+    }
 }
