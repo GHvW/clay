@@ -9,13 +9,37 @@ pub mod play;
 pub mod primitive_readers;
 pub mod byte_reader;
 pub mod util;
+pub mod record_header;
 pub mod shape_readers;
+pub mod shape_data;
 
+use crate::endian::Endian;
+use crate::primitive_readers::{ReadDouble, ReadInt};
 // #![warn(clippy::all)]
 // #[wasm_bindgen]
 // pub fn read_shapes(bytes: &[u8]) -> Option<ShapeFileData> {
 
 // }
+
+
+pub struct ShapeFileReader {
+    big_int: ReadInt,
+    big_double: ReadDouble,
+    little_int: ReadInt,
+    little_double: ReadDouble
+}
+
+impl ShapeFileReader {
+    pub fn new() -> Self {
+        Self {
+            big_int: ReadInt::new(Endian::Big),
+            big_double: ReadDouble::new(Endian::Big),
+            little_int: ReadInt::new(Endian::Little),
+            little_double: ReadDouble::new(Endian::Little)
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

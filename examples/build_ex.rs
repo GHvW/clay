@@ -4,9 +4,8 @@ use std::fs::File;
 
 extern crate clay;
 
-use clay::primitive_readers::DataOps;
-// examples in rust http://xion.io/post/code/rust-examples.html
-// run with cargo run --example main
+use clay::play::{ read_main_file_header, read_version_and_shape_type };
+use clay::primitive_readers::{ ReadDouble, ReadInt, DataOps };
 
 fn main() {
     println!("Hello, world!");
@@ -23,19 +22,9 @@ fn main() {
         .read_to_end(&mut buffer)
         .expect("Error reading bytes into buffer");
 
-    println!("size of shapefile is {} bytes", &buffer.len());
+    let main = read_main_file_header(&buffer).unwrap();
 
-    // let initial: [u8; 4] = 
-    //     buffer[0..4]
-    //         .try_into()
-    //         .unwrap();
-
-    // println!("file code is {:?}", i32::from_be_bytes(initial));
-
-    let main = clay::play::read_main_file_header(&buffer).unwrap();
-    println!("the main file bytes: {:?}", main);
-
-    let versiontype = clay::play::read_version_and_shape_type(&buffer).unwrap();
+    let versiontype = read_version_and_shape_type(&buffer).unwrap();
     println!("version and shapetype is: {:?}", versiontype);
 
     let bounds = clay::play::read_bounds(&buffer).unwrap();

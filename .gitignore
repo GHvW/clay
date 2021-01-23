@@ -6,6 +6,8 @@ Cargo.lock
 .vscode
 .metals
 .idea
+*.txt
 
 node_modules
 shape_file
+defaultish
