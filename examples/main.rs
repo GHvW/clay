@@ -4,6 +4,7 @@ use std::fs::File;
 
 extern crate clay;
 
+use clay::endian::Endian;
 use clay::primitive_readers::DataOps;
 // examples in rust http://xion.io/post/code/rust-examples.html
 // run with cargo run --example main
@@ -43,20 +44,20 @@ fn main() {
 
 
     // let little = clay::endian::Endian::Little;
-    let big = clay::endian::Endian::Big;
+    // let big = clay::endian::Endian::Big;
 
-    let main_header_metadata = clay::primitive_readers::ReadInt::new(&big);
+    let main_header_metadata = clay::primitive_readers::ReadInt::new(Endian::Big);
 
     let main_reader = clay::byte_reader::ByteReader::new(&main_header_metadata, 7);
 
     println!("main reader is: {:?}", &main_reader);
     println!("did this work? {:?}", main_reader.read(0, &buffer).unwrap());
 
-    let little = clay::endian::Endian::Little;
+    // let little = clay::endian::Endian::Little;
 
-    let little_int = clay::primitive_readers::ReadInt::new(&little);
+    let little_int = clay::primitive_readers::ReadInt::new(Endian::Little);
 
-    let little_double = clay::primitive_readers::ReadDouble::new(&little);
+    let little_double = clay::primitive_readers::ReadDouble::new(Endian::Little);
 
     let box_r = clay::shape_readers::bounds_box::BoxR::new(&little_double);
 

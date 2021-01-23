@@ -54,38 +54,4 @@ pub fn read_bounds(bytes: &[u8]) -> Option<Vec<f64>> {
         .collect()
 }
 
-// pub fn read_point(bytes: &[u8]) -> Option<Point> {
-//     (0..2)
-//         .zip(gen_intervals())
-// }
-
-// #[derive(Debug)]
-// pub struct ByteReader<A: DataOps + Sized> {
-//     // primitive_metadata: std::marker::PhantomData<A>,
-//     ops: A,
-//     read_count: usize,
-//     start_byte: usize,
-// }
-
-// impl<A: DataOps + Sized> ByteReader<A> {
-//     pub fn new(ops: A, read_count: usize, start_byte: usize) -> Self {
-//         Self {
-//             ops,
-//             read_count,
-//             start_byte,
-//         }
-//     }
-
-//     pub fn read(&self, bytes: &[u8]) -> Option<Vec<<A as DataOps>::Out>> {
-//         println!("");
-//         (0..self.read_count)
-//             .zip(gen_intervals(self.start_byte, self.read_count, self.ops.size()))
-//             .map(|(_, start)| {
-//                 self.ops
-//                     .read(start, bytes)
-//                     .ok()
-//             })
-//             .collect()
-//     }
-// }
 

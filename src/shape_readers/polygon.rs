@@ -28,11 +28,11 @@ impl PolygonStats {
 
 pub struct PolygonStatsR<'a> {
     box_reader: &'a BoxR<'a>,
-    int_reader: &'a ReadInt<'a>
+    int_reader: &'a ReadInt
 }
 
 impl<'a> PolygonStatsR<'a> {
-    pub fn new(box_reader: &'a BoxR<'a>, int_reader: &'a ReadInt<'a>) -> Self {
+    pub fn new(box_reader: &'a BoxR<'a>, int_reader: &'a ReadInt) -> Self {
         Self {
             box_reader,
             int_reader
@@ -60,7 +60,7 @@ impl<'a> DataOps for PolygonStatsR<'a> {
 
 
 pub struct PolygonPointsR<'a> {
-    part_reader: ByteReader<'a, ReadInt<'a>>,
+    part_reader: ByteReader<'a, ReadInt>,
     point_reader: ByteReader<'a, PointR<'a>>
 }
 
@@ -91,12 +91,12 @@ impl<'a> DataOps for PolygonPointsR<'a> {
 
 pub struct PolygonR<'a> {
     stats_reader: PolygonStatsR<'a>,
-    int_reader: &'a ReadInt<'a>,
+    int_reader: &'a ReadInt,
     point_reader: PointR<'a>
 }
 
 impl<'a> PolygonR<'a> {
-    pub fn new(stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt<'a>, point_reader: PointR<'a>) -> Self {
+    pub fn new(stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt, point_reader: PointR<'a>) -> Self {
         Self {
             stats_reader,
             int_reader,
@@ -130,12 +130,12 @@ impl<'a> DataOps for PolygonR<'a> {
 
 
 pub struct PolygonRecordR<'a> {
-    int_reader: &'a ReadInt<'a>,
+    int_reader: &'a ReadInt,
     polygon_reader: PolygonR<'a>
 }
 
 impl<'a> PolygonRecordR<'a> {
-    pub fn new(int_reader: &'a ReadInt<'a>, polygon_reader: PolygonR<'a>) -> Self {
+    pub fn new(int_reader: &'a ReadInt, polygon_reader: PolygonR<'a>) -> Self {
         Self {
             int_reader,
             polygon_reader
@@ -177,10 +177,9 @@ mod tests {
                          [parts_count, 
                           points_count].concat()].concat();
 
-        let endian = Endian::Little;
 
-        let int_reader = ReadInt::new(&endian);
-        let double_reader = ReadDouble::new(&endian);
+        let int_reader = ReadInt::new(Endian::Little);
+        let double_reader = ReadDouble::new(Endian::Little);
 
         let box_reader = BoxR::new(&double_reader);
 
@@ -209,10 +208,9 @@ mod tests {
 
         let bytes = [parts_bytes, points_bytes].concat();
 
-        let endian = Endian::Little;
 
-        let int_reader = ReadInt::new(&endian);
-        let double_reader = ReadDouble::new(&endian);
+        let int_reader = ReadInt::new(Endian::Little);
+        let double_reader = ReadDouble::new(Endian::Little);
 
         let point_reader = PointR::new(&double_reader);
 

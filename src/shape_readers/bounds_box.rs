@@ -4,7 +4,7 @@ use crate::shapes::BoundingBox;
 
 
 pub struct BoxR<'a> {
-    byte_reader: ByteReader<'a, ReadDouble<'a>>
+    byte_reader: ByteReader<'a, ReadDouble>
 }
 
 impl<'a> BoxR<'a> {
@@ -47,7 +47,7 @@ mod tests {
                      0b01000000, 0b01000000, 0b10111001, 0b10011001, 0b10011001, 0b10011001, 0b10011001, 0b10011010,
                      0b01000000, 0b01010011, 0b10111111, 0b01011100, 0b00101000, 0b11110101, 0b11000010, 0b10001111];
 
-        let double_reader = ReadDouble::new(&Endian::Big);
+        let double_reader = ReadDouble::new(Endian::Big);
         let box_reader = BoxR::new(&double_reader);
 
         // let expected = vec![12345.6789, 54321.9876, 33.45, 78.99];
@@ -71,7 +71,7 @@ mod tests {
                      0b01000000, 0b01010011, 0b10111111, 0b01011100, 0b00101000, 0b11110101, 0b11000010, 0b10001111,
                      0b11111111];
 
-        let double_reader = ReadDouble::new(&Endian::Big);
+        let double_reader = ReadDouble::new(Endian::Big);
         let box_reader = BoxR::new(&double_reader);
 
         // let expected = vec![12345.6789, 54321.9876, 33.45, 78.99];

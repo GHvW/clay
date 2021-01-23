@@ -4,13 +4,13 @@ use crate::shapes::Point;
 use crate::primitive_readers::ReadDouble;
 
 #[derive(Debug)]
-pub struct ByteReader<'a, A: DataOps + Sized + 'a> {
+pub struct ByteReader<'a, A: DataOps + Sized> {
     ops: &'a A,
     read_count: usize,
     // start_byte: usize,
 }
 
-impl<'a, A: DataOps + Sized + 'a> ByteReader<'a, A> {
+impl<'a, A: DataOps + Sized> ByteReader<'a, A> {
     // pub fn new(ops: A, read_count: usize, start_byte: usize) -> Self {
     pub fn new (ops: &'a A, read_count: usize) -> Self {
         Self {

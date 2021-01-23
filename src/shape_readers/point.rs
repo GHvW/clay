@@ -3,7 +3,7 @@ use crate::primitive_readers::{ ReadDouble, DataOps };
 use crate::byte_reader::ByteReader;
 
 pub struct PointR<'a> {
-    byte_reader: ByteReader<'a, ReadDouble<'a>>
+    byte_reader: ByteReader<'a, ReadDouble>
 }
 
 impl<'a> PointR<'a> {
@@ -30,6 +30,8 @@ impl<'a> DataOps for PointR<'a> {
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -46,7 +48,7 @@ mod tests {
         let bytes = [0b01000000, 0b11001000, 0b00011100, 0b11010110, 0b11100110, 0b00110001, 0b11111000, 0b10100001,
                      0b01000000, 0b11101010, 0b10000110, 0b00111111, 0b10011010, 0b01101011, 0b01010000, 0b10110001];
 
-        let double_r = ReadDouble::new(&Endian::Big);
+        let double_r = ReadDouble::new(Endian::Big);
         let reader = PointR::new(&double_r);
 
         // Act
@@ -69,7 +71,7 @@ mod tests {
                      0b01000000, 0b11101010, 0b10000110, 0b00111111, 0b10011010, 0b01101011, 0b01010000, 0b10110001,
                      0b11111111];
 
-        let double_r = ReadDouble::new(&Endian::Big);
+        let double_r = ReadDouble::new(Endian::Big);
         let reader = PointR::new(&double_r);
 
         // Act
