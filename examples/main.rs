@@ -63,7 +63,7 @@ fn main() {
 
     let point_r = clay::shape_readers::point::PointR::new(&little_double);
 
-    let stats = clay::shape_readers::polygon::PolygonStatsR::new(&box_r, &little_int);
+    let stats = clay::shape_readers::polygon::PolygonStatsR::new(box_r, &little_int);
 
     let polygon_r = clay::shape_readers::polygon::PolygonR::new(stats, &little_int, point_r);
 

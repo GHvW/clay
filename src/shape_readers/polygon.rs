@@ -27,12 +27,12 @@ impl PolygonStats {
 
 
 pub struct PolygonStatsR<'a> {
-    box_reader: &'a BoxR<'a>,
+    box_reader: BoxR<'a>,
     int_reader: &'a ReadInt
 }
 
 impl<'a> PolygonStatsR<'a> {
-    pub fn new(box_reader: &'a BoxR<'a>, int_reader: &'a ReadInt) -> Self {
+    pub fn new(box_reader: BoxR<'a>, int_reader: &'a ReadInt) -> Self {
         Self {
             box_reader,
             int_reader
@@ -183,7 +183,7 @@ mod tests {
 
         let box_reader = BoxR::new(&double_reader);
 
-        let stats_reader = PolygonStatsR::new(&box_reader, &int_reader);
+        let stats_reader = PolygonStatsR::new(box_reader, &int_reader);
 
         let actual = stats_reader.read(0, &bytes).unwrap();
 
