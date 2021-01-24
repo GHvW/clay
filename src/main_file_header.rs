@@ -75,6 +75,11 @@ impl<'a> DataOps for MainFileHeaderR<'a> {
         let v_t = self.version_and_typer.read(start + self.init_reader.size(), bytes)?;
         let bounds = self.bounds_reader.read(start + self.init_reader.size() + self.version_and_typer.size(), bytes)?;
 
+        let bounds4 = bounds[4];
+        let bounds5 = bounds[5];
+        let bounds6 = bounds[6];
+        let bounds7 = bounds[7];
+
         Some(MainFileHeader::new(
             init[0], 
             init[6],
@@ -85,10 +90,10 @@ impl<'a> DataOps for MainFileHeaderR<'a> {
                 bounds[1],
                 bounds[2],
                 bounds[3],
-                bounds.get(4).map(|x| *x),
-                bounds.get(5).map(|x| *x),
-                bounds.get(6).map(|x| *x),
-                bounds.get(7).map(|x| *x)
+                if bounds4 == 0.0 { None } else { Some(bounds4) },
+                if bounds5 == 0.0 { None } else { Some(bounds5) },
+                if bounds6 == 0.0 { None } else { Some(bounds6) },
+                if bounds7 == 0.0 { None } else { Some(bounds7) },
             )))
     }
 
@@ -106,7 +111,30 @@ mod tests {
     #[test]
     fn main_file_header_r_works() {
         // Arrange
-        let bytes = [];
+        let main = [
+            i32::to_be_bytes(9994), 
+            i32::to_be_bytes(0), 
+            i32::to_be_bytes(0), 
+            i32::to_be_bytes(0), 
+            i32::to_be_bytes(0), 
+            i32::to_be_bytes(0),
+            i32::to_be_bytes(200),
+            i32::to_le_bytes(1000),
+            i32::to_le_bytes(5)
+        ].concat();
+
+        let bounds = [
+            f64::to_le_bytes(5.5),
+            f64::to_le_bytes(10.5),
+            f64::to_le_bytes(20.5),
+            f64::to_le_bytes(30.5),
+            f64::to_le_bytes(0.0),
+            f64::to_le_bytes(0.0),
+            f64::to_le_bytes(0.0),
+            f64::to_le_bytes(0.0),
+        ].concat();
+
+        let bytes = [main, bounds].concat();
 
         let little = ReadInt::new(Endian::Little);
         let big = ReadInt::new(Endian::Big);
