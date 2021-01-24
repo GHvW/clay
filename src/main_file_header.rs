@@ -1,6 +1,7 @@
 use crate::primitive_readers::{ ReadInt, ReadDouble, DataOps };
 use crate::byte_reader::ByteReader;
 
+#[derive(Debug, PartialEq)]
 pub struct FileHeaderBounds {
     pub x_min: f64,
     pub y_min: f64,
@@ -28,6 +29,7 @@ impl FileHeaderBounds {
 }
 
 
+#[derive(Debug, PartialEq)]
 pub struct MainFileHeader {
     pub file_code: i32,
     pub file_length: i32,
@@ -50,7 +52,6 @@ impl MainFileHeader {
 
 
 pub struct MainFileHeaderR<'a> {
-    // int_reader: &'a ReadInt
     init_reader: ByteReader<'a, ReadInt>,
     version_and_typer: ByteReader<'a, ReadInt>,
     bounds_reader: ByteReader<'a, ReadDouble>
@@ -59,7 +60,7 @@ pub struct MainFileHeaderR<'a> {
 impl<'a> MainFileHeaderR<'a> {
     pub fn new(little_int_reader: &'a ReadInt, big_int_reader: &'a ReadInt, double_reader: &'a ReadDouble) -> Self {
         Self {
-            init_reader: ByteReader::new(big_int_reader, 8),
+            init_reader: ByteReader::new(big_int_reader, 7),
             version_and_typer: ByteReader::new(little_int_reader, 2),
             bounds_reader: ByteReader::new(double_reader, 8)
         }
@@ -93,5 +94,42 @@ impl<'a> DataOps for MainFileHeaderR<'a> {
 
     fn size(&self) -> usize {
         self.init_reader.size() + self.version_and_typer.size() + self.bounds_reader.size()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::endian::Endian;
+
+    #[test]
+    fn main_file_header_r_works() {
+        // Arrange
+        let bytes = [];
+
+        let little = ReadInt::new(Endian::Little);
+        let big = ReadInt::new(Endian::Big);
+        let double = ReadDouble::new(Endian::Little);
+
+        let reader = 
+            MainFileHeaderR::new(
+                &little,
+                &big,
+                &double);
+
+        // Act
+        let actual = reader.read(0, &bytes).unwrap();
+
+        // Assert
+        let expected = 
+            MainFileHeader::new(
+                9994, 
+                200, 
+                1000, 
+                5, 
+                FileHeaderBounds::new(5.5, 10.5, 20.5, 30.5, None, None, None, None));
+
+        assert_eq!(expected, actual);
     }
 }
