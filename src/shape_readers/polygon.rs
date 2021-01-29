@@ -65,10 +65,10 @@ pub struct PolygonPointsR<'a> {
 }
 
 impl<'a> PolygonPointsR<'a> {
-    pub fn new(parts_count: i32, points_count: i32, int_reader: &'a ReadInt, point_reader: &'a PointR) -> Self {
+    pub fn new(parts_count: usize, points_count: usize, int_reader: &'a ReadInt, point_reader: &'a PointR) -> Self {
         Self {
-            part_reader: ByteReader::new(int_reader, parts_count.try_into().unwrap()),
-            point_reader: ByteReader::new(point_reader, points_count.try_into().unwrap()) // TODO better way to handle than unwrap?
+            part_reader: ByteReader::new(int_reader, parts_count),
+            point_reader: ByteReader::new(point_reader, points_count) // TODO better way to handle than unwrap?
         }
     }
 }
@@ -113,8 +113,8 @@ impl<'a> DataOps for PolygonR<'a> {
 
         let points_reader = 
             PolygonPointsR::new(
-                stats.parts_count, 
-                stats.points_count, 
+                stats.parts_count as usize, 
+                stats.points_count as usize, 
                 &self.int_reader, 
                 &self.point_reader);
 
@@ -140,6 +140,10 @@ impl<'a> PolygonRecordR<'a> {
             int_reader,
             polygon_reader
         }
+    }
+
+    pub fn read_many(&self, count: usize) -> ByteReader<PolygonRecordR> {
+        ByteReader::new(self, count)
     }
 }
 
