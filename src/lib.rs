@@ -18,6 +18,7 @@ use crate::primitive_readers::{ReadDouble, ReadInt};
 use crate::shape_readers::polygon::{ PolygonRecordR, PolygonR, PolygonStatsR };
 use crate::shape_readers::bounds_box::BoxR;
 use crate::shape_readers::point::PointR;
+use crate::main_file_header::{MainFileHeaderR};
 // #![warn(clippy::all)]
 // #[wasm_bindgen]
 // pub fn read_shapes(bytes: &[u8]) -> Option<ShapeFileData> {
@@ -59,13 +60,19 @@ impl PrimitiveReaderFactory {
                 PointR::new(&self.big_double)))
     }
 
+    pub fn make_main_file_header_reader(&self) -> MainFileHeaderR {
+        MainFileHeaderR::new(&self.little_int, &self.big_int, &self.little_double)
+    }
+
+    // pub fn make_polygon_record_reader(&self) -> PolygonRecordR
 }
 
 
 #[cfg(test)]
 mod tests {
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn makes_good_mainfileheaderr() {
+
     }
 }
