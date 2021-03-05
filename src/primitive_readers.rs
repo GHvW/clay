@@ -25,8 +25,8 @@ impl DataOps for ReadInt {
     type Out = i32;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        bytes[start..(start + 4)] 
-            .try_into()
+        bytes.get(start..(start + 4))
+            ?.try_into()
             .map(|int_bytes| {
                 self.endian.convert_int32(int_bytes)
             })
@@ -55,8 +55,8 @@ impl DataOps for ReadDouble {
     type Out = f64;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        bytes[start..(start + 8)] 
-            .try_into()
+        bytes.get(start..(start + 8)) 
+            ?.try_into()
             .map(|double_bytes| {
                 self.endian.convert_f64(double_bytes)
             })

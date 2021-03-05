@@ -19,6 +19,7 @@ use crate::shape_readers::polygon::{ PolygonRecordR, PolygonR, PolygonStatsR };
 use crate::shape_readers::bounds_box::BoxR;
 use crate::shape_readers::point::PointR;
 use crate::main_file_header::{MainFileHeaderR};
+use crate::record_header::RecordHeaderR;
 // #![warn(clippy::all)]
 // #[wasm_bindgen]
 // pub fn read_shapes(bytes: &[u8]) -> Option<ShapeFileData> {
@@ -44,20 +45,21 @@ impl PrimitiveReaderFactory {
     }
 
     pub fn make_boxr(&self) -> BoxR {
-        BoxR::new(&self.big_double)
+        BoxR::new(&self.little_double)
     }
 
     pub fn make_pointr(&self) -> PointR {
-        PointR::new(&self.big_double)
+        PointR::new(&self.little_double)
     }
 
     pub fn make_polyr(&self) -> PolygonRecordR {
         PolygonRecordR::new(
-            &self.big_int, 
+            RecordHeaderR::new(&self.big_int),
+            &self.little_int, 
             PolygonR::new(
-                PolygonStatsR::new(BoxR::new(&self.big_double), &self.big_int), 
-                &self.big_int, 
-                PointR::new(&self.big_double)))
+                PolygonStatsR::new(BoxR::new(&self.little_double), &self.little_int), 
+                &self.little_int, 
+                PointR::new(&self.little_double)))
     }
 
     pub fn make_main_file_header_reader(&self) -> MainFileHeaderR {

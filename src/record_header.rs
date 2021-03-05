@@ -2,8 +2,8 @@ use crate::primitive_readers::{ ReadInt, DataOps };
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct RecordHeader {
-    record_number: i32,
-    content_length: i32
+    pub record_number: i32,
+    pub content_length: i32
 }
 
 impl RecordHeader {

@@ -13,8 +13,8 @@ fn main() {
     println!("Hello, world!");
 
     let mut file_handle = 
-        // File::open("./examples/shape_file/supercool.shp")
-        File::open("./examples/defaultish/defautish.shp")
+        File::open("./examples/shape_file/supercool.shp")
+        // File::open("./examples/defaultish/defautish.shp")
             .expect("Couldn't open file");
 
     let mut buffer = Vec::new();
@@ -33,12 +33,19 @@ fn main() {
     println!("main file header: {:?}", main_file_header_r.read(0, &buffer).unwrap());
     println!("main size: {}", main_file_header_r.size());
 
-    let mut offset = 100;
+    let mut offset = 108;
     let mut results = Vec::new();
-    while let Some(poly) = shape_reader.read(offset, &buffer) {
-        println!("the poly: {:?}", poly);
-        results.push(poly);
-        offset += shape_reader.size();
+    // let it = shape_reader.read(offset, &buffer).unwrap();
+    // println!("it is {:?}", it.1);
+    // while let Some(poly) = shape_reader.read(offset, &buffer) {
+    while offset != 454 {
+        println!("current offset: {}", offset);
+        println!("size: {}", shape_reader.size());
+        let poly = shape_reader.read(offset, &buffer).unwrap();
+        println!("the poly: {:?}", poly.1);
+        results.push(poly.1);
+        offset += shape_reader.size() + 8;
+        println!("new offset: {}", offset);
     }
 
     // println!("results: {:?}", results);

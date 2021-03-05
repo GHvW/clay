@@ -6,6 +6,7 @@ use crate::byte_reader::ByteReader;
 use crate::shape_readers::point::PointR;
 use crate::shape_readers::bounds_box::BoxR;
 use crate::shapes::BoundingBox;
+use crate::record_header::RecordHeaderR;
 
 
 #[derive(Debug, PartialEq)]
@@ -88,28 +89,43 @@ impl<'a> DataOps for PolygonPointsR<'a> {
     }
 }
 
+pub struct PolygonRecordData {
+    size: usize,
+    stats: PolygonStats,
+    parts: Vec<i32>,
+    polygon: Polygon
+}
 
-pub struct PolygonR<'a> {
+impl PolygonRecordData {
+    pub fn new(size: usize, stats: PolygonStats, parts: Vec<i32>, polygon: Polygon) -> PolygonRecordData {
+        PolygonRecordData {
+            size, stats, parts, polygon
+        }
+    }
+}
+
+
+pub struct PolygonRecordR<'a> {
+    record_header_reader: RecordHeaderR<'a>,
     stats_reader: PolygonStatsR<'a>,
     int_reader: &'a ReadInt,
     point_reader: PointR<'a>
 }
 
-impl<'a> PolygonR<'a> {
-    pub fn new(stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt, point_reader: PointR<'a>) -> Self {
+impl<'a> PolygonRecordR<'a> {
+    pub fn new(record_header_reader: RecordHeaderR<'a>, stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt, point_reader: PointR<'a>) -> Self {
         Self {
+            record_header_reader,
             stats_reader,
             int_reader,
             point_reader
         }
     }
-}
 
-impl<'a> DataOps for PolygonR<'a> {
-    type Out = Polygon;
-
-    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        let stats = self.stats_reader.read(start, bytes)?;
+    pub fn read_record(&self, start: usize, bytes: &[u8]) -> Option<PolygonRecordData> {
+        let header = self.record_header_reader.read(start, bytes)?;
+        let header_size = self.record_header_reader.size();
+        let stats = self.stats_reader.read(start + header_size, bytes)?;
 
         let points_reader = 
             PolygonPointsR::new(
@@ -118,49 +134,73 @@ impl<'a> DataOps for PolygonR<'a> {
                 &self.int_reader, 
                 &self.point_reader);
 
-        let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
+        let (parts, points) = points_reader.read(start + header_size + self.stats_reader.size(), bytes)?;
 
-        Some(Polygon::new(stats.bounds_box, stats.parts_count, stats.points_count, parts, points))
-    }
-
-    fn size(&self) -> usize {
-        self.point_reader.size() + self.stats_reader.size()
-    }
-}
-
-
-pub struct PolygonRecordR<'a> {
-    int_reader: &'a ReadInt,
-    polygon_reader: PolygonR<'a>
-}
-
-impl<'a> PolygonRecordR<'a> {
-    pub fn new(int_reader: &'a ReadInt, polygon_reader: PolygonR<'a>) -> Self {
-        Self {
-            int_reader,
-            polygon_reader
-        }
-    }
-
-    pub fn read_many(&self, count: usize) -> ByteReader<PolygonRecordR> {
-        ByteReader::new(self, count)
+        Some(
+            PolygonRecordData::new(
+                ((header.content_length * 2) + 8) as usize, // size is in 16 bit words, does not include header size
+                stats,
+                parts,
+                Polygon::new(stats.bounds_box, stats.parts_count, stats.points_count, parts, points)))
     }
 }
 
-impl<'a> DataOps for PolygonRecordR<'a> {
-    type Out = (i32, Polygon);
+// impl<'a> DataOps for PolygonR<'a> {
+//     type Out = (usize, Polygon);
 
-    fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-        let shape_type = self.int_reader.read(start, bytes)?;
-        // TODO check shape type?
-        let polygon = self.polygon_reader.read(start + self.int_reader.size(), bytes)?;
-        Some((shape_type, polygon))
-    }
+//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+//         let stats = self.stats_reader.read(start, bytes)?;
 
-    fn size(&self) -> usize {
-        self.int_reader.size() + self.polygon_reader.size()
-    }
-}
+//         let points_reader = 
+//             PolygonPointsR::new(
+//                 stats.parts_count as usize, 
+//                 stats.points_count as usize, 
+//                 &self.int_reader, 
+//                 &self.point_reader);
+
+//         let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
+
+//         Some((points_reader.size(), Polygon::new(stats.bounds_box, stats.parts_count, stats.points_count, parts, points)))
+//     }
+
+//     fn size(&self) -> usize {
+//         self.point_reader.size() + self.stats_reader.size()
+//     }
+// }
+
+
+// pub struct PolygonRecordR<'a> {
+//     int_reader: &'a ReadInt,
+//     polygon_reader: PolygonR<'a>
+// }
+
+// impl<'a> PolygonRecordR<'a> {
+//     pub fn new(int_reader: &'a ReadInt, polygon_reader: PolygonR<'a>) -> Self {
+//         Self {
+//             int_reader,
+//             polygon_reader
+//         }
+//     }
+
+//     // pub fn read_many(&self, count: usize) -> ByteReader<PolygonRecordR> {
+//     //     ByteReader::new(self, count)
+//     // }
+// }
+
+// impl<'a> DataOps for PolygonRecordR<'a> {
+//     type Out = (i32, Polygon);
+
+//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
+//         let shape_type = self.int_reader.read(start, bytes)?;
+//         // TODO check shape type?
+//         let polygon = self.polygon_reader.read(start + self.int_reader.size(), bytes)?;
+//         Some((shape_type, polygon))
+//     }
+
+//     fn size(&self) -> usize {
+//         self.int_reader.size() + self.polygon_reader.size()
+//     }
+// }
 
 
 #[cfg(test)]
