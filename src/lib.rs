@@ -63,8 +63,6 @@ impl PrimitiveReaderFactory {
     pub fn make_main_file_header_reader(&self) -> MainFileHeaderR {
         MainFileHeaderR::new(&self.little_int, &self.big_int, &self.little_double)
     }
-
-    // pub fn make_polygon_record_reader(&self) -> PolygonRecordR
 }
 
 
