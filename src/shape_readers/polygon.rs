@@ -122,7 +122,6 @@ impl<'a> PolygonRecordR<'a> {
 
     pub fn read_record(&self, start: usize, bytes: &[u8]) -> Option<PolygonRecordData> {
         let header = self.record_header_reader.read(start, bytes)?;
-        println!("content len: {}", (header.content_length * 2) + 8);
         let header_size = self.record_header_reader.size();
         let _shape_type = self.int_reader.read(start + header_size, bytes)?;
         let stats = self.stats_reader.read(start + header_size + self.int_reader.size(), bytes)?;
@@ -136,8 +135,7 @@ impl<'a> PolygonRecordR<'a> {
 
         let (parts, points) = points_reader.read(start + header_size + self.int_reader.size() + self.stats_reader.size(), bytes)?;
 
-        let maybe_content_len = header_size + self.int_reader.size() + self.stats_reader.size() + points_reader.size();
-        println!("maybe content len: {}", maybe_content_len);
+        // let maybe_content_len = header_size + self.int_reader.size() + self.stats_reader.size() + points_reader.size();
         Some(
             PolygonRecordData::new(
                 ((header.content_length * 2) + 8) as usize, // size is in 16 bit words, does not include header size

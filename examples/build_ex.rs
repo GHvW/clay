@@ -37,10 +37,10 @@ fn main() {
     let mut results = Vec::new();
     // let it = shape_reader.read(offset, &buffer).unwrap();
     // println!("it is {:?}", it.1);
-    // while let Some(poly) = shape_reader.read(offset, &buffer) {
-    while offset != 454 {
+    while let Some(poly) = shape_reader.read_record(offset, &buffer) {
+    // while offset != 454 {
         println!("current offset: {}", offset);
-        let poly = shape_reader.read_record(offset, &buffer).unwrap();
+        // let poly = shape_reader.read_record(offset, &buffer).unwrap();
         println!("the poly: {:?}", poly.polygon);
         offset += poly.size;
         results.push(poly);
