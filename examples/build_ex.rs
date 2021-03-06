@@ -1,11 +1,8 @@
 use std::io::prelude::*;
 use std::fs::File;
-// use std::convert::TryInto;
 
 extern crate clay;
 
-// use clay::endian::Endian;
-// use clay::play::{ read_main_file_header, read_version_and_shape_type };
 use clay::primitive_readers::{ DataOps };
 use clay::PrimitiveReaderFactory;
 
@@ -35,17 +32,13 @@ fn main() {
 
     let mut offset = 100;
     let mut results = Vec::new();
-    // let it = shape_reader.read(offset, &buffer).unwrap();
-    // println!("it is {:?}", it.1);
     while let Some(poly) = shape_reader.read_record(offset, &buffer) {
-    // while offset != 454 {
         println!("current offset: {}", offset);
-        // let poly = shape_reader.read_record(offset, &buffer).unwrap();
         println!("the poly: {:?}", poly.polygon);
         offset += poly.size;
         results.push(poly);
         println!("new offset: {}", offset);
     }
 
-    // println!("results: {:?}", results);
+    println!("results count: {:?}", results.len());
 }
