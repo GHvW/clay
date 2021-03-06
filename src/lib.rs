@@ -15,7 +15,7 @@ pub mod shape_data;
 
 use crate::endian::Endian;
 use crate::primitive_readers::{ReadDouble, ReadInt};
-use crate::shape_readers::polygon::{ PolygonRecordR, PolygonR, PolygonStatsR };
+use crate::shape_readers::polygon::{ PolygonRecordR, PolygonStatsR };
 use crate::shape_readers::bounds_box::BoxR;
 use crate::shape_readers::point::PointR;
 use crate::main_file_header::{MainFileHeaderR};
@@ -55,11 +55,9 @@ impl PrimitiveReaderFactory {
     pub fn make_polyr(&self) -> PolygonRecordR {
         PolygonRecordR::new(
             RecordHeaderR::new(&self.big_int),
+            PolygonStatsR::new(BoxR::new(&self.little_double), &self.little_int), 
             &self.little_int, 
-            PolygonR::new(
-                PolygonStatsR::new(BoxR::new(&self.little_double), &self.little_int), 
-                &self.little_int, 
-                PointR::new(&self.little_double)))
+            PointR::new(&self.little_double))
     }
 
     pub fn make_main_file_header_reader(&self) -> MainFileHeaderR {

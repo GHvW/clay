@@ -90,16 +90,14 @@ impl<'a> DataOps for PolygonPointsR<'a> {
 }
 
 pub struct PolygonRecordData {
-    size: usize,
-    stats: PolygonStats,
-    parts: Vec<i32>,
-    polygon: Polygon
+    pub size: usize,
+    pub polygon: Polygon
 }
 
 impl PolygonRecordData {
-    pub fn new(size: usize, stats: PolygonStats, parts: Vec<i32>, polygon: Polygon) -> PolygonRecordData {
+    pub fn new(size: usize, polygon: Polygon) -> PolygonRecordData {
         PolygonRecordData {
-            size, stats, parts, polygon
+            size, polygon
         }
     }
 }
@@ -124,8 +122,10 @@ impl<'a> PolygonRecordR<'a> {
 
     pub fn read_record(&self, start: usize, bytes: &[u8]) -> Option<PolygonRecordData> {
         let header = self.record_header_reader.read(start, bytes)?;
+        println!("content len: {}", (header.content_length * 2) + 8);
         let header_size = self.record_header_reader.size();
-        let stats = self.stats_reader.read(start + header_size, bytes)?;
+        let _shape_type = self.int_reader.read(start + header_size, bytes)?;
+        let stats = self.stats_reader.read(start + header_size + self.int_reader.size(), bytes)?;
 
         let points_reader = 
             PolygonPointsR::new(
@@ -134,13 +134,14 @@ impl<'a> PolygonRecordR<'a> {
                 &self.int_reader, 
                 &self.point_reader);
 
-        let (parts, points) = points_reader.read(start + header_size + self.stats_reader.size(), bytes)?;
+        let (parts, points) = points_reader.read(start + header_size + self.int_reader.size() + self.stats_reader.size(), bytes)?;
 
+        let maybe_content_len = header_size + self.int_reader.size() + self.stats_reader.size() + points_reader.size();
+        println!("maybe content len: {}", maybe_content_len);
         Some(
             PolygonRecordData::new(
                 ((header.content_length * 2) + 8) as usize, // size is in 16 bit words, does not include header size
-                stats,
-                parts,
+                // maybe_content_len as usize,
                 Polygon::new(stats.bounds_box, stats.parts_count, stats.points_count, parts, points)))
     }
 }

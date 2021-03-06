@@ -65,12 +65,12 @@ fn main() {
 
     let stats = clay::shape_readers::polygon::PolygonStatsR::new(box_r, &little_int);
 
-    let polygon_r = clay::shape_readers::polygon::PolygonR::new(stats, &little_int, point_r);
+    // let polygon_r = clay::shape_readers::polygon::PolygonR::new(stats, &little_int, point_r);
 
-    let polygon_record_r = clay::shape_readers::polygon::PolygonRecordR::new(&little_int, polygon_r);
+    // let polygon_record_r = clay::shape_readers::polygon::PolygonRecordR::new(&little_int, polygon_r);
 
-    let (shape_kind, poly) = polygon_record_r.read(108, &buffer).unwrap();
+    // let (shape_kind, poly) = polygon_record_r.read(108, &buffer).unwrap();
 
-    println!("shape type is {}", shape_kind);
-    println!("polygons: {:?}", poly);
+    // println!("shape type is {}", shape_kind);
+    // println!("polygons: {:?}", poly);
 }
