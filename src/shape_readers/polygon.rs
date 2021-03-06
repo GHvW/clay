@@ -144,62 +144,6 @@ impl<'a> PolygonRecordR<'a> {
     }
 }
 
-// impl<'a> DataOps for PolygonR<'a> {
-//     type Out = (usize, Polygon);
-
-//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-//         let stats = self.stats_reader.read(start, bytes)?;
-
-//         let points_reader = 
-//             PolygonPointsR::new(
-//                 stats.parts_count as usize, 
-//                 stats.points_count as usize, 
-//                 &self.int_reader, 
-//                 &self.point_reader);
-
-//         let (parts, points) = points_reader.read(start + self.stats_reader.size(), bytes)?;
-
-//         Some((points_reader.size(), Polygon::new(stats.bounds_box, stats.parts_count, stats.points_count, parts, points)))
-//     }
-
-//     fn size(&self) -> usize {
-//         self.point_reader.size() + self.stats_reader.size()
-//     }
-// }
-
-
-// pub struct PolygonRecordR<'a> {
-//     int_reader: &'a ReadInt,
-//     polygon_reader: PolygonR<'a>
-// }
-
-// impl<'a> PolygonRecordR<'a> {
-//     pub fn new(int_reader: &'a ReadInt, polygon_reader: PolygonR<'a>) -> Self {
-//         Self {
-//             int_reader,
-//             polygon_reader
-//         }
-//     }
-
-//     // pub fn read_many(&self, count: usize) -> ByteReader<PolygonRecordR> {
-//     //     ByteReader::new(self, count)
-//     // }
-// }
-
-// impl<'a> DataOps for PolygonRecordR<'a> {
-//     type Out = (i32, Polygon);
-
-//     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
-//         let shape_type = self.int_reader.read(start, bytes)?;
-//         // TODO check shape type?
-//         let polygon = self.polygon_reader.read(start + self.int_reader.size(), bytes)?;
-//         Some((shape_type, polygon))
-//     }
-
-//     fn size(&self) -> usize {
-//         self.int_reader.size() + self.polygon_reader.size()
-//     }
-// }
 
 
 #[cfg(test)]
