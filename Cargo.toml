@@ -6,4 +6,10 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "clay"
+path = "src/lib.rs"
+
 [dependencies]
+wasm-bindgen = "0.2"

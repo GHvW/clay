@@ -1,11 +1,10 @@
-// use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::*;
 
 pub mod endian;
 pub mod shape_type;
 pub mod shapes;
 pub mod multi_patch_part_type;
 pub mod main_file_header;
-pub mod play;
 pub mod primitive_readers;
 pub mod byte_reader;
 pub mod util;
@@ -20,21 +19,21 @@ use crate::shape_readers::bounds_box::BoxR;
 use crate::shape_readers::point::PointR;
 use crate::main_file_header::{MainFileHeaderR};
 use crate::record_header::RecordHeaderR;
+
 // #![warn(clippy::all)]
-// #[wasm_bindgen]
-// pub fn read_shapes(bytes: &[u8]) -> Option<ShapeFileData> {
-
-// }
 
 
-pub struct PrimitiveReaderFactory {
+#[wasm_bindgen]
+pub struct ShapeReaderFactory {
     big_int: ReadInt,
     big_double: ReadDouble,
     little_int: ReadInt,
     little_double: ReadDouble,
 }
 
-impl PrimitiveReaderFactory {
+#[wasm_bindgen]
+impl ShapeReaderFactory {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
             big_int: ReadInt::new(Endian::Big),

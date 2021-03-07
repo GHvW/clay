@@ -1,3 +1,4 @@
+// use wasm_bindgen::prelude::*;
 use std::convert::TryInto;
 
 use crate::shapes::{ Point, Polygon };
@@ -101,7 +102,6 @@ impl PolygonRecordData {
         }
     }
 }
-
 
 pub struct PolygonRecordR<'a> {
     record_header_reader: RecordHeaderR<'a>,

@@ -4,7 +4,7 @@ use std::fs::File;
 extern crate clay;
 
 use clay::primitive_readers::{ DataOps };
-use clay::PrimitiveReaderFactory;
+use clay::ShapeReaderFactory;
 
 fn main() {
     println!("Hello, world!");
@@ -21,7 +21,7 @@ fn main() {
         .read_to_end(&mut buffer)
         .expect("Error reading bytes into buffer");
 
-    let factory = PrimitiveReaderFactory::new();
+    let factory = ShapeReaderFactory::new();
 
     let main_file_header_r = &factory.make_main_file_header_reader();
 
@@ -32,6 +32,7 @@ fn main() {
 
     let mut offset = 100;
     let mut results = Vec::new();
+
     while let Some(poly) = shape_reader.read_record(offset, &buffer) {
         println!("current offset: {}", offset);
         println!("the poly: {:?}", poly.polygon);
