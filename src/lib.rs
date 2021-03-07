@@ -23,7 +23,7 @@ use crate::record_header::RecordHeaderR;
 // #![warn(clippy::all)]
 
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct ShapeReaderFactory {
     big_int: ReadInt,
     big_double: ReadDouble,
@@ -31,9 +31,9 @@ pub struct ShapeReaderFactory {
     little_double: ReadDouble,
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl ShapeReaderFactory {
-    #[wasm_bindgen(constructor)]
+    // #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
             big_int: ReadInt::new(Endian::Big),
