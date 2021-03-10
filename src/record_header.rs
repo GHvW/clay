@@ -16,17 +16,17 @@ impl RecordHeader {
 }
 
 
-pub struct RecordHeaderR<'a> {
-    int_reader: &'a ReadInt
+pub struct RecordHeaderR {
+    int_reader: ReadInt
 }
 
-impl<'a> RecordHeaderR<'a> {
-    pub fn new(int_reader: &'a ReadInt) -> Self {
+impl RecordHeaderR {
+    pub fn new(int_reader: ReadInt) -> Self {
         Self { int_reader }
     }
 }
 
-impl<'a> DataOps for RecordHeaderR<'a> {
+impl DataOps for RecordHeaderR {
     type Out = RecordHeader;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -55,7 +55,7 @@ mod tests {
 
         let int_reader = ReadInt::new(Endian::Big);
 
-        let reader = RecordHeaderR::new(&int_reader);
+        let reader = RecordHeaderR::new(int_reader);
 
         // act
         let actual = reader.read(0, &bytes).unwrap();

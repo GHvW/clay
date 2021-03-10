@@ -44,23 +44,23 @@ impl ShapeReaderFactory {
     }
 
     pub fn make_boxr(&self) -> BoxR {
-        BoxR::new(&self.little_double)
+        BoxR::new(self.little_double)
     }
 
     pub fn make_pointr(&self) -> PointR {
-        PointR::new(&self.little_double)
+        PointR::new(self.little_double)
     }
 
     pub fn make_polyr(&self) -> PolygonRecordR {
         PolygonRecordR::new(
-            RecordHeaderR::new(&self.big_int),
-            PolygonStatsR::new(BoxR::new(&self.little_double), &self.little_int), 
-            &self.little_int, 
-            PointR::new(&self.little_double))
+            RecordHeaderR::new(self.big_int),
+            PolygonStatsR::new(BoxR::new(self.little_double), self.little_int), 
+            self.little_int, 
+            self.make_pointr())
     }
 
     pub fn make_main_file_header_reader(&self) -> MainFileHeaderR {
-        MainFileHeaderR::new(&self.little_int, &self.big_int, &self.little_double)
+        MainFileHeaderR::new(self.little_int, self.big_int, self.little_double)
     }
 }
 

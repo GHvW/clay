@@ -28,13 +28,13 @@ impl PolygonStats {
 }
 
 
-pub struct PolygonStatsR<'a> {
-    box_reader: BoxR<'a>,
-    int_reader: &'a ReadInt
+pub struct PolygonStatsR {
+    box_reader: BoxR,
+    int_reader: ReadInt
 }
 
-impl<'a> PolygonStatsR<'a> {
-    pub fn new(box_reader: BoxR<'a>, int_reader: &'a ReadInt) -> Self {
+impl PolygonStatsR {
+    pub fn new(box_reader: BoxR, int_reader: ReadInt) -> Self {
         Self {
             box_reader,
             int_reader
@@ -42,7 +42,7 @@ impl<'a> PolygonStatsR<'a> {
     }
 }
 
-impl<'a> DataOps for PolygonStatsR<'a> {
+impl DataOps for PolygonStatsR {
     type Out = PolygonStats;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -61,13 +61,13 @@ impl<'a> DataOps for PolygonStatsR<'a> {
 
 
 
-pub struct PolygonPointsR<'a> {
-    part_reader: ByteReader<'a, ReadInt>,
-    point_reader: ByteReader<'a, PointR<'a>>
+pub struct PolygonPointsR {
+    part_reader: ByteReader<ReadInt>,
+    point_reader: ByteReader<PointR>
 }
 
-impl<'a> PolygonPointsR<'a> {
-    pub fn new(parts_count: usize, points_count: usize, int_reader: &'a ReadInt, point_reader: &'a PointR) -> Self {
+impl PolygonPointsR {
+    pub fn new(parts_count: usize, points_count: usize, int_reader: ReadInt, point_reader: PointR) -> Self {
         Self {
             part_reader: ByteReader::new(int_reader, parts_count),
             point_reader: ByteReader::new(point_reader, points_count) // TODO better way to handle than unwrap?
@@ -75,7 +75,7 @@ impl<'a> PolygonPointsR<'a> {
     }
 }
 
-impl<'a> DataOps for PolygonPointsR<'a> {
+impl DataOps for PolygonPointsR {
     type Out = (Vec<i32>, Vec<Point>);
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -103,15 +103,15 @@ impl PolygonRecordData {
     }
 }
 
-pub struct PolygonRecordR<'a> {
-    record_header_reader: RecordHeaderR<'a>,
-    stats_reader: PolygonStatsR<'a>,
-    int_reader: &'a ReadInt,
-    point_reader: PointR<'a>
+pub struct PolygonRecordR {
+    record_header_reader: RecordHeaderR,
+    stats_reader: PolygonStatsR,
+    int_reader: ReadInt,
+    point_reader: PointR
 }
 
-impl<'a> PolygonRecordR<'a> {
-    pub fn new(record_header_reader: RecordHeaderR<'a>, stats_reader: PolygonStatsR<'a>, int_reader: &'a ReadInt, point_reader: PointR<'a>) -> Self {
+impl PolygonRecordR {
+    pub fn new(record_header_reader: RecordHeaderR, stats_reader: PolygonStatsR, int_reader: ReadInt, point_reader: PointR) -> Self {
         Self {
             record_header_reader,
             stats_reader,
@@ -130,8 +130,8 @@ impl<'a> PolygonRecordR<'a> {
             PolygonPointsR::new(
                 stats.parts_count as usize, 
                 stats.points_count as usize, 
-                &self.int_reader, 
-                &self.point_reader);
+                self.int_reader, 
+                self.point_reader);
 
         let (parts, points) = points_reader.read(start + header_size + self.int_reader.size() + self.stats_reader.size(), bytes)?;
 
@@ -168,9 +168,9 @@ mod tests {
         let int_reader = ReadInt::new(Endian::Little);
         let double_reader = ReadDouble::new(Endian::Little);
 
-        let box_reader = BoxR::new(&double_reader);
+        let box_reader = BoxR::new(double_reader);
 
-        let stats_reader = PolygonStatsR::new(box_reader, &int_reader);
+        let stats_reader = PolygonStatsR::new(box_reader, int_reader);
 
         let actual = stats_reader.read(0, &bytes).unwrap();
 
@@ -199,9 +199,9 @@ mod tests {
         let int_reader = ReadInt::new(Endian::Little);
         let double_reader = ReadDouble::new(Endian::Little);
 
-        let point_reader = PointR::new(&double_reader);
+        let point_reader = PointR::new(double_reader);
 
-        let stats_reader = PolygonPointsR::new(2, 4, &int_reader, &point_reader);
+        let stats_reader = PolygonPointsR::new(2, 4, int_reader, point_reader);
 
         let (actual_parts, actual_points) = stats_reader.read(0, &bytes).unwrap();
 

@@ -2,19 +2,20 @@ use crate::shapes::Point;
 use crate::primitive_readers::{ ReadDouble, DataOps };
 use crate::byte_reader::ByteReader;
 
-pub struct PointR<'a> {
-    byte_reader: ByteReader<'a, ReadDouble>
+#[derive(Copy, Clone)]
+pub struct PointR {
+    byte_reader: ByteReader<ReadDouble>
 }
 
-impl<'a> PointR<'a> {
-    pub fn new(double_reader: &'a ReadDouble) -> Self {
+impl PointR {
+    pub fn new(double_reader: ReadDouble) -> Self {
         Self { 
             byte_reader: ByteReader::new(double_reader, 2)
         }
     }
 }
 
-impl<'a> DataOps for PointR<'a> {
+impl DataOps for PointR {
     type Out = Point;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -49,7 +50,7 @@ mod tests {
                      0b01000000, 0b11101010, 0b10000110, 0b00111111, 0b10011010, 0b01101011, 0b01010000, 0b10110001];
 
         let double_r = ReadDouble::new(Endian::Big);
-        let reader = PointR::new(&double_r);
+        let reader = PointR::new(double_r);
 
         // Act
         let result = reader.read(0, &bytes).unwrap();
@@ -72,7 +73,7 @@ mod tests {
                      0b11111111];
 
         let double_r = ReadDouble::new(Endian::Big);
-        let reader = PointR::new(&double_r);
+        let reader = PointR::new(double_r);
 
         // Act
         let result = reader.read(1, &bytes).unwrap();

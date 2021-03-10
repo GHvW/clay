@@ -1,5 +1,5 @@
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum Endian {
     Big,
     Little

@@ -10,7 +10,7 @@ pub trait DataOps {
 }
 
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct ReadInt {
     endian: Endian
 }
@@ -39,7 +39,7 @@ impl DataOps for ReadInt {
 }
 
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct ReadDouble {
     endian: Endian
 }

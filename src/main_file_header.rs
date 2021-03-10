@@ -51,14 +51,14 @@ impl MainFileHeader {
 }
 
 
-pub struct MainFileHeaderR<'a> {
-    init_reader: ByteReader<'a, ReadInt>,
-    version_and_typer: ByteReader<'a, ReadInt>,
-    bounds_reader: ByteReader<'a, ReadDouble>
+pub struct MainFileHeaderR {
+    init_reader: ByteReader<ReadInt>,
+    version_and_typer: ByteReader<ReadInt>,
+    bounds_reader: ByteReader<ReadDouble>
 }
 
-impl<'a> MainFileHeaderR<'a> {
-    pub fn new(little_int_reader: &'a ReadInt, big_int_reader: &'a ReadInt, double_reader: &'a ReadDouble) -> Self {
+impl MainFileHeaderR {
+    pub fn new(little_int_reader: ReadInt, big_int_reader: ReadInt, double_reader: ReadDouble) -> Self {
         Self {
             init_reader: ByteReader::new(big_int_reader, 7),
             version_and_typer: ByteReader::new(little_int_reader, 2),
@@ -67,7 +67,7 @@ impl<'a> MainFileHeaderR<'a> {
     }
 }
 
-impl<'a> DataOps for MainFileHeaderR<'a> {
+impl DataOps for MainFileHeaderR {
     type Out = MainFileHeader;
 
     fn read(&self, start: usize, bytes: &[u8]) -> Option<Self::Out> {
@@ -142,9 +142,9 @@ mod tests {
 
         let reader = 
             MainFileHeaderR::new(
-                &little,
-                &big,
-                &double);
+                little,
+                big,
+                double);
 
         // Act
         let actual = reader.read(0, &bytes).unwrap();
