@@ -1,14 +1,14 @@
-use crate::parser::Parser;
-use crate::shapes::bounding_box::shape::BoundingBox;
+// use crate::parser::Parser;
+// use crate::shapes::bounding_box::shape::BoundingBox;
 
-pub struct BoundingBoxParser {
+// pub struct BoundingBoxParser {
 
-}
+// }
 
-impl Parser for BoundingBoxParser {
-    type Out = BoundingBox;
+// impl Parser for BoundingBoxParser {
+//     type Out = BoundingBox;
 
-    fn call(&self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
-        Some((BoundingBox::new(10.0, 10.0, 10.0, 10.0), &Vec::new()))
-    }
-}
+//     fn call(&self, bytes: &[u8]) -> Option<(Self::Out, &[u8])> {
+//         Some((BoundingBox::new(10.0, 10.0, 10.0, 10.0), &Vec::new()))
+//     }
+// }
